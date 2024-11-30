@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
+    <title>Sign Up</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-        }
-        h1 {
-            color: #333;
         }
         input, button {
             width: 100%;
@@ -32,75 +29,34 @@
     </style>
 </head>
 <body>
-    <h1>Sign Up to Be Notified</h1>
+    <h1>Sign Up to Be Notified of Launch</h1>
     <form id="signup-form">
         <input type="email" id="email" placeholder="Enter your email" required>
         <button type="submit">Sign Up</button>
     </form>
 
-    <script src="script.js"></script>
-    <script>const urlList = ["url1", "url2", "url3", "url4", "url5"];
-let currentUrlIndex = localStorage.getItem("currentUrlIndex") || 0;
+    <script>
+        const urlList = ["url1", "url2", "url3", "url4", "url5"];
+        let currentUrlIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
 
-// Fingerprint library (for example: FingerprintJS)
-function generateFingerprint() {
-    return Math.random().toString(36).substring(2); // Simplified for demo
-}
+        // Assign URL to user
+        function assignUrlToUser(email) {
+            const userUrl = `${urlList[currentUrlIndex]}`;
+            localStorage.setItem("userEmail", email);
+            localStorage.setItem("userUrl", userUrl);
 
-// Save user data and assign URL
-function saveUser(email, name) {
-    const userFingerprint = generateFingerprint();
-    const userUrl = `${urlList[currentUrlIndex]}?name=${encodeURIComponent(name)}`;
-    localStorage.setItem("userEmail", email);
-    localStorage.setItem("userName", name);
-    localStorage.setItem("userFingerprint", userFingerprint);
-    localStorage.setItem("userUrl", userUrl);
-    localStorage.setItem("currentUrlIndex", (parseInt(currentUrlIndex) + 1) % urlList.length);
-}
+            // Increment URL index, wrap around if it exceeds length
+            currentUrlIndex = (currentUrlIndex + 1) % urlList.length;
+            localStorage.setItem("currentUrlIndex", currentUrlIndex);
+        }
 
-// Redirect returning user
-function redirectReturningUser() {
-    const userUrl = localStorage.getItem("userUrl");
-    if (userUrl) window.location.href = "/share-3/form/";
-}
-
-// Landing page logic
-if (window.location.pathname.endsWith("index.html")) {
-    redirectReturningUser();
-
-    const form = document.getElementById("signup-form");
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const email = document.getElementById("email").value;
-        const name = email.split("@")[0]; // Simplified name generation
-        saveUser(email, name);
-        window.location.href = "/share-3/form/";
-    });
-}
-
-// Sharing page logic
-if (window.location.pathname.endsWith("form.html")) {
-    const userUrl = localStorage.getItem("userUrl");
-    const userName = localStorage.getItem("userName");
-
-    if (!userUrl || !userName) {
-        window.location.href = "index.html";
-    } else {
-        document.getElementById("user-link").value = userUrl;
-
-        const previewMessage = `Hi, ${userName} has invited you to check this out: ${userUrl}`;
-        document.getElementById("preview-message").value = previewMessage;
-
-        document.getElementById("sms-button").href = `sms:?body=${encodeURIComponent(previewMessage)}`;
-        document.getElementById("email-button").href = "mailto:?subject=Join us&body=" + encodeURIComponent(previewMessage);
-        document.getElementById("whatsapp-button").href = `https://wa.me/?text=${encodeURIComponent(previewMessage)}`;
-        document.getElementById("facebook-button").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(userUrl)}`;
-
-        document.getElementById("stats-button").addEventListener("click", () => {
-            window.location.href = `${userUrl}.stats`;
+        // Handle Signup Form Submit
+        document.getElementById("signup-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            assignUrlToUser(email);
+            window.location.href = "form.html"; // Redirect to sharing page
         });
-    }
-}
-</script>
+    </script>
 </body>
 </html>
