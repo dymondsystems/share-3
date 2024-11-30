@@ -3,86 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
+    <title>Sign-Up Page</title>
 </head>
 <body>
     <h1>Sign Up for Beta Access</h1>
+
     <form id="signup-form">
-        <label for="email">Enter your email:</label><br>
-        <input type="email" id="email" required><br>
+        <label for="email">Your Email:</label><br>
+        <input type="email" id="email" placeholder="Enter your email" required><br><br>
         <button type="button" id="signup-button">Sign Up</button>
     </form>
 
+    <p id="message"></p>
+
     <script>
+        // List of predefined URLs
         const urls = [
             "https://example.com/url1",
             "https://example.com/url2",
             "https://example.com/url3"
         ];
 
-        const cookieExpiryHours = 48;
-
+        // Utility to generate a simple fingerprint
         function generateFingerprint() {
-            return (
-                navigator.userAgent +
-                screen.width +
-                screen.height +
-                navigator.language
-            );
+            return `${navigator.userAgent}_${screen.width}x${screen.height}_${Date.now()}`;
         }
 
-        function setCookie(name, value, hours) {
-            const d = new Date();
-            d.setTime(d.getTime() + hours * 60 * 60 * 1000);
-            document.cookie = `${name}=${value}; expires=${d.toUTCString()}; path=/`;
+        // Utility to set a cookie
+        function setCookie(name, value, days) {
+            const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+            document.cookie = `${name}=${value}; expires=${expires}; path=/`;
         }
 
+        // Utility to get a cookie
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
             if (parts.length === 2) return parts.pop().split(";").shift();
         }
 
+        // Handle sign-up logic
         document.getElementById("signup-button").addEventListener("click", () => {
             const email = document.getElementById("email").value;
             if (!email) {
-                alert("Please enter a valid email.");
+                document.getElementById("message").textContent = "Please enter a valid email.";
                 return;
             }
 
-            const fingerprint = generateFingerprint();
-            let assignedUrl = localStorage.getItem(`url_${fingerprint}`);
+            // Generate or retrieve fingerprint
+            let fingerprint = getCookie("fingerprint");
+            if (!fingerprint) {
+                fingerprint = generateFingerprint();
+                setCookie("fingerprint", fingerprint, 2); // Set cookie for 2 days
+            }
 
-            // Redirect returning user
-            if (assignedUrl) {
+            // Check if the user already has an assigned URL
+            const existingUrl = localStorage.getItem(`url_${fingerprint}`);
+            if (existingUrl) {
+                document.getElementById("message").textContent = "You are already signed up!";
                 window.location.href = "sharing.html";
                 return;
             }
 
-            // Get the next available URL
-            let assignedUrlIndex = parseInt(localStorage.getItem("urlIndex")) || 0;
-            if (assignedUrlIndex >= urls.length) {
-                alert("No more URLs available.");
-                window.location.href = "/dashboard.html"; // Redirect to dashboard if URLs are exhausted
+            // Assign the next available URL
+            const assignedUrls = JSON.parse(localStorage.getItem("assignedUrls")) || [];
+            const nextUrl = urls.find((url) => !assignedUrls.includes(url));
+
+            if (!nextUrl) {
+                document.getElementById("message").textContent = "No more URLs available. Please try again later.";
                 return;
             }
 
-            assignedUrl = urls[assignedUrlIndex];
-            localStorage.setItem(`url_${fingerprint}`, assignedUrl);
-            localStorage.setItem("urlIndex", assignedUrlIndex + 1);
+            // Save assigned URL and update assigned list
+            localStorage.setItem(`url_${fingerprint}`, nextUrl);
+            assignedUrls.push(nextUrl);
+            localStorage.setItem("assignedUrls", JSON.stringify(assignedUrls));
 
-            // Store email and set cookie
-            localStorage.setItem("email", email);
-            setCookie("fingerprint", fingerprint, cookieExpiryHours);
-
+            // Confirm sign-up and redirect to sharing page
+            document.getElementById("message").textContent = "You have successfully signed up!";
             window.location.href = "sharing.html";
         });
-
-        // Redirect if user already signed in
-        const fingerprint = getCookie("fingerprint");
-        if (fingerprint && localStorage.getItem(`url_${fingerprint}`)) {
-            window.location.href = "sharing.html";
-        }
     </script>
 </body>
 </html>
