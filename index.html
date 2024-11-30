@@ -3,89 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
-    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+    <title>Signup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Sign Up for Early Access</h1>
+    <h1>Sign Up to Be Notified</h1>
     <form id="signup-form">
-        <label for="email">Enter your email:</label>
-        <input type="email" id="email" required placeholder="Your Email">
+        <input type="email" id="email" placeholder="Enter your email" required>
         <button type="submit">Sign Up</button>
     </form>
 
-    <script>
-        // Example URL list
-        const urls = ["url1", "url2", "url3", "url4"];
+    <script src="script.js"></script>
+    <script>const urlList = ["url1", "url2", "url3", "url4", "url5"];
+let currentUrlIndex = localStorage.getItem("currentUrlIndex") || 0;
 
-        // Generate a fingerprint using FingerprintJS
-        async function generateFingerprint() {
-            console.log("Generating fingerprint...");
-            const fp = await FingerprintJS.load(); // Initialize the FingerprintJS library
-            const result = await fp.get(); // Get the fingerprint
-            console.log("Fingerprint generated:", result.visitorId); // Log the unique visitor ID
-            return result.visitorId; // Return the unique ID
-        }
+// Fingerprint library (for example: FingerprintJS)
+function generateFingerprint() {
+    return Math.random().toString(36).substring(2); // Simplified for demo
+}
 
-        // Function to assign a URL based on the fingerprint
-        async function assignUrl() {
-            const fingerprint = await generateFingerprint();
+// Save user data and assign URL
+function saveUser(email, name) {
+    const userFingerprint = generateFingerprint();
+    const userUrl = `${urlList[currentUrlIndex]}?name=${encodeURIComponent(name)}`;
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userName", name);
+    localStorage.setItem("userFingerprint", userFingerprint);
+    localStorage.setItem("userUrl", userUrl);
+    localStorage.setItem("currentUrlIndex", (parseInt(currentUrlIndex) + 1) % urlList.length);
+}
 
-            console.log("Assigning URL for fingerprint:", fingerprint);
+// Redirect returning user
+function redirectReturningUser() {
+    const userUrl = localStorage.getItem("userUrl");
+    if (userUrl) window.location.href = "/share-3/form/";
+}
 
-            // Simple hash-based index for selecting URL
-            const urlIndex = parseInt(fingerprint.substr(0, 8), 16) % urls.length;
-            const assignedUrl = urls[urlIndex];
+// Landing page logic
+if (window.location.pathname.endsWith("index.html")) {
+    redirectReturningUser();
 
-            console.log("Assigned URL:", assignedUrl);
+    const form = document.getElementById("signup-form");
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const name = email.split("@")[0]; // Simplified name generation
+        saveUser(email, name);
+        window.location.href = "/share-3/form/";
+    });
+}
 
-            // Store in localStorage
-            localStorage.setItem("userFingerprint", fingerprint);
-            localStorage.setItem("userUrl", assignedUrl);
+// Sharing page logic
+if (window.location.pathname.endsWith("form.html")) {
+    const userUrl = localStorage.getItem("userUrl");
+    const userName = localStorage.getItem("userName");
 
-            // Redirect the user
-            window.location.href = "/share-3/form/"; // Modify as needed
-        }
+    if (!userUrl || !userName) {
+        window.location.href = "index.html";
+    } else {
+        document.getElementById("user-link").value = userUrl;
 
-        // Form submission handling
-        async function handleSignup(event) {
-            event.preventDefault(); // Stop the form from reloading the page
-            console.log("Signup button clicked!");
+        const previewMessage = `Hi, ${userName} has invited you to check this out: ${userUrl}`;
+        document.getElementById("preview-message").value = previewMessage;
 
-            const emailInput = document.getElementById("email");
-            const email = emailInput.value;
+        document.getElementById("sms-button").href = `sms:?body=${encodeURIComponent(previewMessage)}`;
+        document.getElementById("email-button").href = "mailto:?subject=Join us&body=" + encodeURIComponent(previewMessage);
+        document.getElementById("whatsapp-button").href = `https://wa.me/?text=${encodeURIComponent(previewMessage)}`;
+        document.getElementById("facebook-button").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(userUrl)}`;
 
-            if (!email) {
-                alert("Please enter a valid email address.");
-                console.log("No email entered.");
-                return;
-            }
-
-            console.log("Email entered:", email);
-
-            // Check if the user already signed up
-            const existingFingerprint = localStorage.getItem("userFingerprint");
-            if (existingFingerprint) {
-                console.log("Returning user detected, redirecting...");
-                window.location.href = "dashboard.html"; // Modify as needed
-            } else {
-                console.log("New user detected, generating fingerprint...");
-                await assignUrl(); // Generate fingerprint and assign URL
-            }
-        }
-
-        // Attach event listener to the signup form
-        document.addEventListener("DOMContentLoaded", () => {
-            console.log("Page loaded, attaching event listener...");
-            const signupForm = document.getElementById("signup-form");
-
-            if (signupForm) {
-                signupForm.addEventListener("submit", handleSignup);
-                console.log("Event listener attached to form.");
-            } else {
-                console.error("Signup form not found!");
-            }
+        document.getElementById("stats-button").addEventListener("click", () => {
+            window.location.href = `${userUrl}.stats`;
         });
-    </script>
+    }
+}
+</script>
 </body>
 </html>
