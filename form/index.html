@@ -43,6 +43,7 @@
         return;
       }
 
+      // Fetch the assigned URL based on the fingerprint
       const assignedUrl = localStorage.getItem(`url_${fingerprint}`);
       if (!assignedUrl) {
         window.location.href = "signup.html";
@@ -53,18 +54,23 @@
       const messageBox = document.getElementById("message-preview");
       const linkBox = document.getElementById("link-only");
 
-      const name = nameInput.value || "user";
-      const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
+      document.getElementById("generate-button").addEventListener("click", () => {
+        const name = nameInput.value || "user";
+        const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
 
-      messageBox.value = `Check out this amazing site: ${personalizedUrl}`;
-      linkBox.value = personalizedUrl;
+        // Populate preview areas
+        messageBox.value = `Check out this amazing site: ${personalizedUrl}`;
+        linkBox.value = personalizedUrl;
+      });
 
+      // Stats button functionality
       document.getElementById("stats-button").addEventListener("click", () => {
         window.location.href = `${assignedUrl}.stats`;
       });
     }
 
-    document.getElementById("generate-button").addEventListener("click", loadSharingInfo);
+    // Call on page load
+    loadSharingInfo();
   </script>
 </body>
 </html>
