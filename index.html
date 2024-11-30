@@ -1,74 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up</title>
-</head>
-<body>
-  <h1>Sign Up for Early Access</h1>
-  <form id="signup-form">
-    <label for="email">Email:</label>
-    <input type="email" id="email" placeholder="Enter your email" required>
-    <button type="button" id="signup-button">Sign Up</button>
-  </form>
-  <p id="message"></p>
+<script>
+  const urls = [
+    "https://example.com/url1",
+    "https://example.com/url2",
+    "https://example.com/url3"
+  ];
 
-  <script>
-    const urls = [
-      "https://example.com/url1",
-      "https://example.com/url2",
-      "https://example.com/url3"
-    ];
+  function generateFingerprint() {
+    return `${navigator.userAgent}_${screen.width}x${screen.height}_${Date.now()}`;
+  }
 
-    function generateFingerprint() {
-      return `${navigator.userAgent}_${screen.width}x${screen.height}_${Date.now()}`;
+  function getOrSetUrl(fingerprint) {
+    const existingUrl = localStorage.getItem(`url_${fingerprint}`);
+    if (existingUrl) {
+      console.log(`Returning user with URL: ${existingUrl}`);
+      return existingUrl;
     }
 
-    function getOrSetUrl(fingerprint) {
-      const existingUrl = localStorage.getItem(`url_${fingerprint}`);
-      if (existingUrl) {
-        console.log(`Returning user with URL: ${existingUrl}`);
-        return existingUrl;
-      }
+    let currentIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
 
-      let currentIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
-      console.log(`Current URL index: ${currentIndex}`);
-
-      if (currentIndex >= urls.length) {
-        document.getElementById("message").textContent = "No more URLs available.";
-        return null;
-      }
-
-      const assignedUrl = urls[currentIndex];
-      console.log(`Assigning URL: ${assignedUrl}`);
-
-      localStorage.setItem(`url_${fingerprint}`, assignedUrl);
-      currentIndex = (currentIndex + 1) % urls.length;
-      localStorage.setItem("currentUrlIndex", currentIndex);
-      console.log(`Next URL index set to: ${currentIndex}`);
-
-      return assignedUrl;
+    if (currentIndex >= urls.length) {
+      document.getElementById("message").textContent = "No more URLs available.";
+      return null;
     }
 
-    document.getElementById("signup-button").addEventListener("click", () => {
-      const email = document.getElementById("email").value;
-      if (!email) {
-        document.getElementById("message").textContent = "Please enter a valid email.";
-        return;
-      }
+    const assignedUrl = urls[currentIndex];
+    localStorage.setItem(`url_${fingerprint}`, assignedUrl);
 
-      const fingerprint = generateFingerprint();
-      const assignedUrl = getOrSetUrl(fingerprint);
+    // Increment and store the next URL index
+    currentIndex = (currentIndex + 1) % urls.length;
+    localStorage.setItem("currentUrlIndex", currentIndex);
 
-      if (assignedUrl) {
-        document.cookie = `fingerprint=${fingerprint}; path=/; max-age=172800`; // 48 hours
-        document.getElementById("message").textContent = `You have been assigned: ${assignedUrl}`;
-        setTimeout(() => {
-          window.location.href = `/form/`;
-        }, 2000);
-      }
-    });
-  </script>
-</body>
-</html>
+    return assignedUrl;
+  }
+
+  document.getElementById("signup-button").addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    if (!email) {
+      document.getElementById("message").textContent = "Please enter a valid email.";
+      return;
+    }
+
+    const fingerprint = generateFingerprint();
+    const assignedUrl = getOrSetUrl(fingerprint);
+
+    if (assignedUrl) {
+      document.cookie = `fingerprint=${fingerprint}; path=/; max-age=172800`; // 48 hours
+      document.getElementById("message").textContent = `You have been assigned: ${assignedUrl}`;
+      setTimeout(() => {
+        window.location.href = "sharing.html";
+      }, 2000);
+    }
+  });
+</script>
