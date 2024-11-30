@@ -39,22 +39,32 @@
         const urlList = ["url1", "url2", "url3", "url4", "url5"];
         let currentUrlIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
 
-        // Assign URL to user
-        function assignUrlToUser(email) {
+        // Generate a unique user ID using the current timestamp if it doesn't exist
+        function generateUserId() {
+            let userId = localStorage.getItem('userId');
+            if (!userId) {
+                userId = 'user-' + Date.now();
+                localStorage.setItem('userId', userId);
+            }
+            return userId;
+        }
+
+        // Assign URL to the user based on the userId
+        function assignUrlToUser(userId) {
             const userUrl = `${urlList[currentUrlIndex]}`;
-            localStorage.setItem("userEmail", email);
-            localStorage.setItem("userUrl", userUrl);
+            localStorage.setItem(`userUrl_${userId}`, userUrl);
 
             // Increment URL index, wrap around if it exceeds length
             currentUrlIndex = (currentUrlIndex + 1) % urlList.length;
             localStorage.setItem("currentUrlIndex", currentUrlIndex);
         }
 
-        // Handle Signup Form Submit
+        // Handle Sign-Up Form Submit
         document.getElementById("signup-form").addEventListener("submit", (e) => {
             e.preventDefault();
             const email = document.getElementById("email").value;
-            assignUrlToUser(email);
+            const userId = generateUserId();
+            assignUrlToUser(userId);
             window.location.href = "form.html"; // Redirect to sharing page
         });
     </script>
