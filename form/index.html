@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const friend2 = document.getElementById("friend2").value;
         const friend3 = document.getElementById("friend3").value;
 
-        const personalizedUrl = `${userUrl}?ref=${name}`;
+        const personalizedUrl = `${userUrl}?name=${name}`;
         const shareMessage = `Hi! ${decodeURIComponent(name)} is inviting you to check this out: ${personalizedUrl}`;
 
         // Update the preview and raw link
