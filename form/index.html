@@ -35,13 +35,15 @@
             const userId = generateFingerprint();
             const userUrl = localStorage.getItem('userUrl_' + userId);
 
-            if (userUrl) {
+            if (!userUrl) {
+                // Redirect if no URL is found
+                window.location.href = "index.html"; 
+            } else {
                 // Display the assigned URL
                 document.getElementById('user-link').textContent = userUrl;
-            } else {
-                window.location.href = "https://dymond.systems/share-3/"; // Redirect if no URL found
             }
 
+            // Generate preview for the share buttons
             document.getElementById("generate-preview").addEventListener("click", () => {
                 const name = document.getElementById("name").value;
                 const urlWithName = `${userUrl}?name=${encodeURIComponent(name)}`;
@@ -58,11 +60,11 @@
             document.getElementById("reset-button").addEventListener("click", () => {
                 resetFingerprint();
                 alert("Fingerprint and URL data have been reset!");
-                window.location.href = "https://dymond.systems/share-3/"; // Redirect to the landing page after reset
+                window.location.href = "index.html"; // Redirect to the landing page after reset
             });
         });
 
-        // Simple function to generate a unique fingerprint
+        // Function to generate a unique fingerprint
         function generateFingerprint() {
             const fingerprintData = [
                 navigator.userAgent,  // User agent string
