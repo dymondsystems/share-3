@@ -3,102 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beta Signup</title>
+    <title>Sign Up</title>
 </head>
 <body>
-    <h1>Sign up to be notified of launch</h1>
+    <h1>Sign Up for Early Access</h1>
     <form id="signup-form">
-        <label for="email">Email:</label>
+        <label for="email">Enter your email:</label>
         <input type="email" id="email" required>
         <button type="submit">Sign Up</button>
     </form>
-    <script src="landing.js"></script>
+
+    <script>
+        const urls = ["url1", "url2", "url3", "url4"]; // Your list of URLs
+        let urlIndex = 0; // Tracking the next URL to assign
+
+        // Function to get the next available URL in a circular rotation
+        function getNextUrl() {
+            const assignedUrl = urls[urlIndex];
+            urlIndex = (urlIndex + 1) % urls.length; // Circular rotation (loops back to the start)
+            return assignedUrl;
+        }
+
+        // Check if the user is already signed in by checking localStorage
+        function checkIfSignedIn() {
+            const assignedUrl = localStorage.getItem("userUrl");
+            if (assignedUrl) {
+                // Redirect the user to a different page (e.g., dashboard) if they already have a URL assigned
+                window.location.href = "dashboard.html"; // Or wherever you want to send them
+            }
+        }
+
+        // Call checkIfSignedIn on page load to auto-redirect returning users
+        checkIfSignedIn();
+
+        // Event listener for the signup form
+        document.getElementById("signup-form").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const email = document.getElementById("email").value;
+
+            // If the user hasn't been assigned a URL before, assign them one
+            if (!localStorage.getItem("userUrl")) {
+                const assignedUrl = getNextUrl();
+                console.log("Assigned URL: ", assignedUrl); // Log or use it as needed
+
+                // Store the user's email and assigned URL in localStorage
+                localStorage.setItem("userEmail", email);
+                localStorage.setItem("userUrl", assignedUrl);
+
+                // Redirect the user to the next page where they can view/share the URL
+                window.location.href = "/share-3/form/"; // Or another page where you show the URL
+            }
+        });
+    </script>
 </body>
 </html>
-
-<script>
-const urls = ["url1", "url2", "url3"]; // List of URLs to be assigned
-const COOKIE_NAME = 'url_counter';
-const COOKIE_EXPIRATION_DAYS = 30; // Cookie expiration time
-
-// Function to get a cookie value by name
-function getCookie(name) {
-    const value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-    return value ? value[2] : null;
-}
-
-// Function to set a cookie with an expiration date
-function setCookie(name, value, days) {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Set expiration time
-    document.cookie = name + "=" + value + "; expires=" + date.toUTCString() + "; path=/";
-}
-
-// Function to get the next URL based on the counter
-function getNextUrl() {
-    let currentIndex = parseInt(getCookie(COOKIE_NAME)) || 0;
-
-    if (currentIndex >= urls.length) {
-        window.location.href = "no-urls.html"; // No URLs left
-        return null;
-    }
-
-    const assignedUrl = urls[currentIndex];
-    
-    // Increment counter for next URL assignment
-    setCookie(COOKIE_NAME, currentIndex + 1, COOKIE_EXPIRATION_DAYS);
-    
-    return assignedUrl;
-}
-
-// Handle user sign up
-document.getElementById("signup-form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const email = document.getElementById("email").value;
-    
-    const userEmail = localStorage.getItem("userEmail");
-
-    if (userEmail && userEmail === email) {
-        // If the user has already signed up, redirect to the form page
-        window.location.href = "https://dymond.systems/share-3/form/";
-        return;
-    }
-
-    // Assign URL and store it in localStorage
-    const assignedUrl = getNextUrl();
-
-    if (assignedUrl) {
-        localStorage.setItem("userEmail", email); // Save user email
-        localStorage.setItem("userUrl", assignedUrl); // Save user URL
-        
-        // Redirect to form page
-        window.location.href = "https://dymond.systems/share-3/form/";
-    }
-});
-
-// Redirect returning user to form with their assigned URL
-document.addEventListener("DOMContentLoaded", () => {
-    const userEmail = localStorage.getItem("userEmail");
-    const userUrl = localStorage.getItem("userUrl");
-
-    if (userEmail && userUrl) {
-        document.getElementById("assigned-url").textContent = `Your assigned URL is: ${userUrl}`;
-        document.getElementById("user-email").textContent = `Your email: ${userEmail}`;
-    } else {
-        // Redirect to landing page if no URL is assigned
-        window.location.href = "/share-3/";
-    }
-});
-
-// Sign-out button logic
-document.getElementById("sign-out-button").addEventListener("click", () => {
-    // Clear user data
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userUrl");
-
-    // Redirect to landing page
-    window.location.href = "/share-3/";
-});
-
-
-</script>
