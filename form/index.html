@@ -3,99 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invite Friends</title>
-
+    <title>Share Your Invite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        textarea, input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button, a {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        button:hover, a:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Invite Your Friends</h1>
-    <button id="sign-out-button" style="background: red; color: white;">Sign Out</button>
-    <form id="invite-form">
-        <label for="name">Your Name:</label>
-        <input type="text" id="name" required>
-        <label for="friend1">Friend's Email 1:</label>
-        <input type="email" id="friend1">
-        <label for="friend2">Friend's Email 2:</label>
-        <input type="email" id="friend2">
-        <label for="friend3">Friend's Email 3:</label>
-        <input type="email" id="friend3">
-        <button type="submit">Generate Links</button>
-    </form>
-    <div id="share-section" style="display: none;">
-        <textarea id="message-preview" readonly></textarea>
-        <textarea id="raw-link" readonly></textarea>
-        <button id="sms-button">Share via SMS</button>
-        <button id="email-button">Share via Email</button>
-        <button id="whatsapp-button">Share via WhatsApp</button>
-        <button id="facebook-button">Share via Facebook</button>
-        <button id="stats-button">View Stats</button>
-    </div>
-    <script src="form.js"></script>
+    <h1>Share with Friends</h1>
+    <textarea id="user-link" readonly></textarea>
+
+    <h2>Invite Your Friends</h2>
+    <input type="email" id="friend-email-1" placeholder="Friend's Email 1">
+    <input type="email" id="friend-email-2" placeholder="Friend's Email 2">
+    <input type="email" id="friend-email-3" placeholder="Friend's Email 3">
+
+    <h3>Preview Message:</h3>
+    <textarea id="preview-message" readonly></textarea>
+
+    <h2>Share Options</h2>
+    <a id="sms-button" href="#">Share via SMS</a>
+    <a id="email-button" href="#">Share via Email</a>
+    <a id="whatsapp-button" href="#">Share via WhatsApp</a>
+    <a id="facebook-button" href="#">Share via Facebook</a>
+
+    <button id="stats-button">View Stats</button>
+
+    <script src="script.js"></script>
 </body>
 </html>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
+
+<script>const urlList = ["url1", "url2", "url3", "url4", "url5"];
+let currentUrlIndex = localStorage.getItem("currentUrlIndex") || 0;
+
+// Fingerprint library (for example: FingerprintJS)
+function generateFingerprint() {
+    return Math.random().toString(36).substring(2); // Simplified for demo
+}
+
+// Save user data and assign URL
+function saveUser(email, name) {
+    const userFingerprint = generateFingerprint();
+    const userUrl = `${urlList[currentUrlIndex]}?name=${encodeURIComponent(name)}`;
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userName", name);
+    localStorage.setItem("userFingerprint", userFingerprint);
+    localStorage.setItem("userUrl", userUrl);
+    localStorage.setItem("currentUrlIndex", (parseInt(currentUrlIndex) + 1) % urlList.length);
+}
+
+// Redirect returning user
+function redirectReturningUser() {
     const userUrl = localStorage.getItem("userUrl");
-    const userEmail = localStorage.getItem("userEmail");
+    if (userUrl) window.location.href = "form.html";
+}
 
-    if (!userUrl || !userEmail) {
-        // Redirect to landing page if no session exists
-        window.location.href = "#";
-        return;
-    }
+// Landing page logic
+if (window.location.pathname.endsWith("index.html")) {
+    redirectReturningUser();
 
-    document.getElementById("invite-form").addEventListener("submit", (event) => {
-        event.preventDefault();
+    const form = document.getElementById("signup-form");
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const name = email.split("@")[0]; // Simplified name generation
+        saveUser(email, name);
+        window.location.href = "form.html";
+    });
+}
 
-        const name = encodeURIComponent(document.getElementById("name").value);
-        const friend1 = document.getElementById("friend1").value;
-        const friend2 = document.getElementById("friend2").value;
-        const friend3 = document.getElementById("friend3").value;
+// Sharing page logic
+if (window.location.pathname.endsWith("form.html")) {
+    const userUrl = localStorage.getItem("userUrl");
+    const userName = localStorage.getItem("userName");
 
-        const personalizedUrl = `${userUrl}?name=${name}`;
-        const shareMessage = `Hi! ${decodeURIComponent(name)} is inviting you to check this out: ${personalizedUrl}`;
+    if (!userUrl || !userName) {
+        window.location.href = "index.html";
+    } else {
+        document.getElementById("user-link").value = userUrl;
 
-        // Update the preview and raw link
-        document.getElementById("share-section").style.display = "block";
-        document.getElementById("message-preview").value = shareMessage;
-        document.getElementById("raw-link").value = personalizedUrl;
+        const previewMessage = `Hi, ${userName} has invited you to check this out: ${userUrl}`;
+        document.getElementById("preview-message").value = previewMessage;
 
-        // Generate share links
-        document.getElementById("sms-button").onclick = () => {
-            window.location.href = `sms:?body=${encodeURIComponent(shareMessage)}`;
-        };
-        document.getElementById("email-button").onclick = () => {
-            window.location.href = `mailto:${[friend1, friend2, friend3].filter(Boolean).join(",")}?subject=Invitation&body=${encodeURIComponent(shareMessage)}`;
-        };
-        document.getElementById("whatsapp-button").onclick = () => {
-            window.location.href = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
-        };
-        document.getElementById("facebook-button").onclick = () => {
-            window.location.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`;
-        };
+        document.getElementById("sms-button").href = `sms:?body=${encodeURIComponent(previewMessage)}`;
+        document.getElementById("email-button").href = "mailto:?subject=Join us&body=" + encodeURIComponent(previewMessage);
+        document.getElementById("whatsapp-button").href = `https://wa.me/?text=${encodeURIComponent(previewMessage)}`;
+        document.getElementById("facebook-button").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(userUrl)}`;
 
-        // Stats button
-        document.getElementById("stats-button").onclick = () => {
+        document.getElementById("stats-button").addEventListener("click", () => {
             window.location.href = `${userUrl}.stats`;
-        };
-    });
-
-    // Sign Out Button
-    document.getElementById("sign-out-button").addEventListener("click", () => {
-        // Clear localStorage keys for the session
-        localStorage.removeItem("userEmail");
-        localStorage.removeItem("userUrl");
-
-        // Optionally clear other session-related data
-        localStorage.removeItem("assignedUrls");
-
-        // Clear cookies (if used)
-        document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-        // Redirect to landing page
-        window.location.href = "#";
-    });
-});
-
-
+        });
+    }
+}
 </script>
