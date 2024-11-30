@@ -27,18 +27,26 @@
 
     function getOrSetUrl(fingerprint) {
       const existingUrl = localStorage.getItem(`url_${fingerprint}`);
-      if (existingUrl) return existingUrl;
+      if (existingUrl) {
+        console.log(`Returning user with URL: ${existingUrl}`);
+        return existingUrl;
+      }
 
       let currentIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
+      console.log(`Current URL index: ${currentIndex}`);
+
       if (currentIndex >= urls.length) {
         document.getElementById("message").textContent = "No more URLs available.";
         return null;
       }
 
       const assignedUrl = urls[currentIndex];
+      console.log(`Assigning URL: ${assignedUrl}`);
+
       localStorage.setItem(`url_${fingerprint}`, assignedUrl);
       currentIndex = (currentIndex + 1) % urls.length;
       localStorage.setItem("currentUrlIndex", currentIndex);
+      console.log(`Next URL index set to: ${currentIndex}`);
 
       return assignedUrl;
     }
@@ -55,7 +63,10 @@
 
       if (assignedUrl) {
         document.cookie = `fingerprint=${fingerprint}; path=/; max-age=172800`; // 48 hours
-        window.location.href = `https://dymond.systems/share-3/form`;
+        document.getElementById("message").textContent = `You have been assigned: ${assignedUrl}`;
+        setTimeout(() => {
+          window.location.href = `sharing.html`;
+        }, 2000);
       }
     });
   </script>
