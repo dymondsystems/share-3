@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <script src="https://cdn.jsdelivr.net/npm/fingerprintjs2@2.1.0/dist/fingerprint2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
 </head>
 <body>
     <h1>Sign Up for Early Access</h1>
@@ -17,55 +17,75 @@
     <script>
         // Example URL list
         const urls = ["url1", "url2", "url3", "url4"];
-        
-        // Fingerprint-based URL assignment
-        function generateFingerprint(callback) {
-            new Fingerprint2().get(function(result) {
-                callback(result);  // Pass fingerprint to callback
-            });
+
+        // Generate a fingerprint using FingerprintJS
+        async function generateFingerprint() {
+            console.log("Generating fingerprint...");
+            const fp = await FingerprintJS.load(); // Initialize the FingerprintJS library
+            const result = await fp.get(); // Get the fingerprint
+            console.log("Fingerprint generated:", result.visitorId); // Log the unique visitor ID
+            return result.visitorId; // Return the unique ID
         }
 
-        // Function to assign URL based on fingerprint
-        function assignUrl(fingerprint) {
-            // Compute the URL index using a simple hash-based method
+        // Function to assign a URL based on the fingerprint
+        async function assignUrl() {
+            const fingerprint = await generateFingerprint();
+
+            console.log("Assigning URL for fingerprint:", fingerprint);
+
+            // Simple hash-based index for selecting URL
             const urlIndex = parseInt(fingerprint.substr(0, 8), 16) % urls.length;
             const assignedUrl = urls[urlIndex];
-            
-            // Store the fingerprint and assigned URL
+
+            console.log("Assigned URL:", assignedUrl);
+
+            // Store in localStorage
             localStorage.setItem("userFingerprint", fingerprint);
             localStorage.setItem("userUrl", assignedUrl);
 
-            console.log("Assigned URL:", assignedUrl);  // For debugging purposes
-
-            // Redirect user to form page or dashboard
-            window.location.href = "form.html";  // Change to wherever you want the user to go
+            // Redirect the user
+            window.location.href = "/share-3/form/"; // Modify as needed
         }
 
-        // Event listener for form submission
-        document.getElementById("signup-form").addEventListener("submit", (event) => {
-            event.preventDefault();  // Prevent the form from reloading the page
+        // Form submission handling
+        async function handleSignup(event) {
+            event.preventDefault(); // Stop the form from reloading the page
+            console.log("Signup button clicked!");
 
-            const email = document.getElementById("email").value;  // Get the email entered by the user
+            const emailInput = document.getElementById("email");
+            const email = emailInput.value;
+
             if (!email) {
                 alert("Please enter a valid email address.");
-                return;  // If no email is entered, do nothing
+                console.log("No email entered.");
+                return;
             }
 
-            // Check if the user already has a fingerprint (indicating they've signed up before)
+            console.log("Email entered:", email);
+
+            // Check if the user already signed up
             const existingFingerprint = localStorage.getItem("userFingerprint");
-
             if (existingFingerprint) {
-                // Redirect to the dashboard or wherever you want returning users to go
-                window.location.href = "dashboard.html";  // Modify as needed
+                console.log("Returning user detected, redirecting...");
+                window.location.href = "dashboard.html"; // Modify as needed
             } else {
-                // New user: generate fingerprint and assign URL
-                generateFingerprint(assignUrl);
+                console.log("New user detected, generating fingerprint...");
+                await assignUrl(); // Generate fingerprint and assign URL
             }
+        }
 
-             // Redirect to form page
-    window.location.href = "/share-3/form/";
-});
-       
+        // Attach event listener to the signup form
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("Page loaded, attaching event listener...");
+            const signupForm = document.getElementById("signup-form");
+
+            if (signupForm) {
+                signupForm.addEventListener("submit", handleSignup);
+                console.log("Event listener attached to form.");
+            } else {
+                console.error("Signup form not found!");
+            }
+        });
     </script>
 </body>
 </html>
