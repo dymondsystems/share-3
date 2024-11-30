@@ -27,6 +27,9 @@
 
     <button id="stats-button">View Stats</button>
 
+    <!-- Add Reset Button -->
+    <button id="reset-button">Reset Fingerprint</button>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const userId = generateFingerprint();
@@ -36,7 +39,7 @@
                 // Display the assigned URL
                 document.getElementById('user-link').textContent = userUrl;
             } else {
-                window.location.href = "index.html"; // Redirect if no URL found
+                window.location.href = "https://dymond.systems/share-3/"; // Redirect if no URL found
             }
 
             document.getElementById("generate-preview").addEventListener("click", () => {
@@ -50,10 +53,47 @@
                 document.getElementById("whatsapp-button").href = `https://wa.me/?text=${encodeURIComponent(previewMessage)}`;
                 document.getElementById("facebook-button").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlWithName)}`;
             });
+
+            // Reset Fingerprint functionality
+            document.getElementById("reset-button").addEventListener("click", () => {
+                resetFingerprint();
+                alert("Fingerprint and URL data have been reset!");
+                window.location.href = "https://dymond.systems/share-3/"; // Redirect to the landing page after reset
+            });
         });
 
+        // Simple function to generate a unique fingerprint
         function generateFingerprint() {
-            return navigator.userAgent + screen.width + screen.height + navigator.language;
+            const fingerprintData = [
+                navigator.userAgent,  // User agent string
+                screen.width,         // Screen width
+                screen.height,        // Screen height
+                navigator.language,   // User's language
+                new Date().getTime()   // Current timestamp
+            ].join('|');
+
+            // Hash the fingerprint data to create a more unique ID
+            return hashString(fingerprintData);
+        }
+
+        // A simple hashing function to generate a unique ID
+        function hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash &= hash; // Convert to 32bit integer
+            }
+            return hash.toString();
+        }
+
+        // Reset Fingerprint function
+        function resetFingerprint() {
+            const userId = generateFingerprint();
+            // Remove the stored fingerprint-related data from localStorage
+            localStorage.removeItem('userUrl_' + userId);
+            localStorage.removeItem('assignedUrlIndex_' + userId);
+            localStorage.removeItem('userEmail_' + userId);
         }
     </script>
 </body>
