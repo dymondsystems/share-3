@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (userEmail && userUrl) {
         // Redirect returning user to the form page
-        window.location.href = "/form/";
+        window.location.href = "/share-3/form/";
         return;
     }
 });
@@ -41,7 +41,7 @@ document.getElementById("signup-form").addEventListener("submit", (event) => {
     // Check if this email has already signed up and assigned a URL
     if (storedEmail === email) {
         // Redirect to form page if user already signed up
-        window.location.href = "/form/";
+        window.location.href = "/share-3/form/";
         return;
     }
 
@@ -72,7 +72,7 @@ document.getElementById("signup-form").addEventListener("submit", (event) => {
     localStorage.setItem("assignedUrls", JSON.stringify(assignedUrls));
 
     // Redirect to form page
-    window.location.href = "/form/";
+    window.location.href = "/share-3/form/";
 });
 
 
