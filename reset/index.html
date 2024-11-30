@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Invite</title>
+</head>
+<body>
+    <h1>Share with Friends</h1>
+
+    <p id="user-link"></p>
+    <input type="text" id="name" placeholder="Enter your name">
+    <input type="email" id="friend-email-1" placeholder="Friend's Email 1">
+    <input type="email" id="friend-email-2" placeholder="Friend's Email 2">
+    <input type="email" id="friend-email-3" placeholder="Friend's Email 3">
+
+    <button id="generate-preview">Generate Preview</button>
+
+    <h3>Preview Message:</h3>
+    <textarea id="preview-message" readonly></textarea>
+
+    <h2>Share Options</h2>
+    <a id="sms-button" href="#">Share via SMS</a>
+    <a id="email-button" href="#">Share via Email</a>
+    <a id="whatsapp-button" href="#">Share via WhatsApp</a>
+    <a id="facebook-button" href="#">Share via Facebook</a>
+
+    <button id="stats-button">View Stats</button>
+
+    <!-- Add Reset Button -->
+    <button id="reset-button">Reset Fingerprint</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = generateFingerprint();
+            const userUrl = localStorage.getItem('userUrl_' + userId);
+
+            if (userUrl) {
+                // Display the assigned URL
+                document.getElementById('user-link').textContent = userUrl;
+            } else {
+                window.location.href = "index.html"; // Redirect if no URL found
+            }
+
+            document.getElementById("generate-preview").addEventListener("click", () => {
+                const name = document.getElementById("name").value;
+                const urlWithName = `${userUrl}?name=${encodeURIComponent(name)}`;
+                document.getElementById("preview-message").value = `Hi, ${name} has invited you to check this out: ${urlWithName}`;
+
+                // Set share links
+                document.getElementById("sms-button").href = `sms:?body=${encodeURIComponent(previewMessage)}`;
+                document.getElementById("email-button").href = `mailto:?subject=Join us&body=${encodeURIComponent(previewMessage)}`;
+                document.getElementById("whatsapp-button").href = `https://wa.me/?text=${encodeURIComponent(previewMessage)}`;
+                document.getElementById("facebook-button").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlWithName)}`;
+            });
+
+            // Reset Fingerprint functionality
+            document.getElementById("reset-button").addEventListener("click", () => {
+                resetFingerprint();
+                alert("Fingerprint and URL data have been reset!");
+                window.location.href = "index.html"; // Redirect to the landing page after reset
+            });
+        });
+
+        function generateFingerprint() {
+            return navigator.userAgent + screen.width + screen.height + navigator.language;
+        }
+
+        function resetFingerprint() {
+            const userId = generateFingerprint();
+            // Remove the stored fingerprint-related data from localStorage
+            localStorage.removeItem('userUrl_' + userId);
+            localStorage.removeItem('assignedUrlIndex_' + userId);
+            localStorage.removeItem('userEmail_' + userId);
+        }
+    </script>
+</body>
+</html>
