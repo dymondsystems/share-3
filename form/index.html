@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!userUrl || !userEmail) {
         // Redirect to landing page if no session exists
-        window.location.href = "landing.html";
+        window.location.href = "https://dymond.systems/share-3/";
         return;
     }
 
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.removeItem("userUrl");
 
         // Optionally clear other session-related data
-        localStorage.removeItem("currentIndex");
+        localStorage.removeItem("assignedUrls");
 
         // Clear cookies (if used)
         document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -96,5 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "https://dymond.systems/share-3/";
     });
 });
+
 
 </script>
