@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
+    <script src="https://cdn.jsdelivr.net/npm/fingerprintjs2@2.1.0/dist/fingerprint2.min.js"></script>
 </head>
 <body>
     <h1>Sign Up for Early Access</h1>
@@ -14,44 +15,46 @@
     </form>
 
     <script>
-        const urls = ["url1", "url2", "url3", "url4"]; // Your list of URLs
-        let urlIndex = 0; // Tracking the next URL to assign
+        const urls = ["url1", "url2", "url3", "url4"]; // Example URL list
+        let urlIndex = 0; // URL counter
 
-        // Function to get the next available URL in a circular rotation
-        function getNextUrl() {
+        // Function to generate the fingerprint
+        function generateFingerprint(callback) {
+            new Fingerprint2().get(function(result) {
+                callback(result); // Pass the fingerprint to the callback function
+            });
+        }
+
+        // Function to assign the URL based on the fingerprint
+        function assignUrl(fingerprint) {
+            // Get the index from the fingerprint (could be any hash-based function)
+            urlIndex = parseInt(fingerprint.substr(0, 8), 16) % urls.length;
+
+            // Get the assigned URL
             const assignedUrl = urls[urlIndex];
-            urlIndex = (urlIndex + 1) % urls.length; // Circular rotation (loops back to the start)
-            return assignedUrl;
-        }
+            console.log("Assigned URL: ", assignedUrl);
 
-        // Check if the user is already signed in by checking localStorage
-        function checkIfSignedIn() {
-            const assignedUrl = localStorage.getItem("userUrl");
-            if (assignedUrl) {
-                // Redirect the user to a different page (e.g., dashboard) if they already have a URL assigned
-                window.location.href = "dashboard.html"; // Or wherever you want to send them
-            }
-        }
+            // Store the fingerprint and assigned URL
+            localStorage.setItem("userFingerprint", fingerprint);
+            localStorage.setItem("userUrl", assignedUrl);
 
-        // Call checkIfSignedIn on page load to auto-redirect returning users
-        checkIfSignedIn();
+            // Redirect user to another page
+            window.location.href = "/share-3/form/"; // Redirect to form or wherever
+        }
 
         // Event listener for the signup form
         document.getElementById("signup-form").addEventListener("submit", (event) => {
             event.preventDefault();
             const email = document.getElementById("email").value;
 
-            // If the user hasn't been assigned a URL before, assign them one
-            if (!localStorage.getItem("userUrl")) {
-                const assignedUrl = getNextUrl();
-                console.log("Assigned URL: ", assignedUrl); // Log or use it as needed
-
-                // Store the user's email and assigned URL in localStorage
-                localStorage.setItem("userEmail", email);
-                localStorage.setItem("userUrl", assignedUrl);
-
-                // Redirect the user to the next page where they can view/share the URL
-                window.location.href = "/share-3/form/"; // Or another page where you show the URL
+            // Check if the user has a fingerprint and URL assigned
+            const existingFingerprint = localStorage.getItem("userFingerprint");
+            if (existingFingerprint) {
+                // Redirect returning user (they already have a URL)
+                window.location.href = "dashboard.html";
+            } else {
+                // New user, generate fingerprint and assign URL
+                generateFingerprint(assignUrl);
             }
         });
     </script>
