@@ -3,53 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up for Beta</title>
+  <title>Sign Up</title>
 </head>
 <body>
-  <h1>Sign Up for Beta Launch</h1>
-  
+  <h1>Sign Up</h1>
+
   <form id="signup-form">
-    <label for="email">Email:</label>
-    <input type="email" id="email" required placeholder="Enter your email">
+    <label for="email">Enter Your Email:</label>
+    <input type="email" id="email" placeholder="Enter your email" required><br><br>
+
     <button type="submit">Sign Up</button>
   </form>
 
   <script>
-    // Utility function to get a cookie
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(";").shift();
-      return null;
+    // Utility function to check if user is signed in
+    function checkSignIn() {
+      // Check if email is in localStorage (user is signed in)
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (userEmail) {
+        // If signed in, redirect to the dashboard page
+        window.location.href = "dashboard.html";
+      }
     }
 
-    // Handle user sign-up form submission
-    document.getElementById('signup-form').addEventListener('submit', function(e) {
-      e.preventDefault();
+    // Call the function to check if the user is signed in
+    checkSignIn();
+
+    // Handle the sign up form submission
+    document.getElementById('signup-form').addEventListener('submit', function (e) {
+      e.preventDefault(); // Prevent the form from submitting normally
+
+      // Get the email entered by the user
       const email = document.getElementById('email').value;
 
-      // Check if email is already saved
-      if (localStorage.getItem('userEmail') || getCookie('userFingerprint')) {
-        return; // Redirect to sharing page if email exists
-      }
-
-      // Store email and fingerprint (use fingerprint for URL assignment)
+      // Store the email in localStorage (this signifies the user is signed up)
       localStorage.setItem('userEmail', email);
-      const fingerprint = generateFingerprint();
-      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`; // Store fingerprint in cookie for 48 hours
 
-      // Debugging output
-      console.log('Email saved to localStorage:', email);
-      console.log('Fingerprint saved to cookie:', fingerprint);
-
-      // Redirect to sharing page after successful signup
-      window.location.href = 'sharing.html';
+      // Redirect to the sharing page (or wherever you want)
+      window.location.href = "https://dymond.systems/share-3/form/";
     });
-
-    // Function to generate a fingerprint (using device-specific data)
-    function generateFingerprint() {
-      return `${navigator.userAgent}${screen.width}${screen.height}${navigator.language}`;
-    }
   </script>
 </body>
 </html>
