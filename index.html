@@ -21,10 +21,12 @@
         const urls = [
             "https://example.com/url1",
             "https://example.com/url2",
-            "https://example.com/url3"
+            "https://example.com/url3",
+            "https://example.com/url4",
+            "https://example.com/url5"
         ];
 
-        // Utility to generate a simple fingerprint
+        // Utility to generate a fingerprint
         function generateFingerprint() {
             return `${navigator.userAgent}_${screen.width}x${screen.height}_${Date.now()}`;
         }
@@ -65,23 +67,27 @@
                 return;
             }
 
-            // Assign the next available URL
-            const assignedUrls = JSON.parse(localStorage.getItem("assignedUrls")) || [];
-            const nextUrl = urls.find((url) => !assignedUrls.includes(url));
+            // Retrieve the current URL index or initialize it
+            let currentIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
+
+            // Assign the next URL in rotation
+            const nextUrl = urls[currentIndex];
 
             if (!nextUrl) {
                 document.getElementById("message").textContent = "No more URLs available. Please try again later.";
                 return;
             }
 
-            // Save assigned URL and update assigned list
+            // Save assigned URL to localStorage
             localStorage.setItem(`url_${fingerprint}`, nextUrl);
-            assignedUrls.push(nextUrl);
-            localStorage.setItem("assignedUrls", JSON.stringify(assignedUrls));
+
+            // Increment and store the new index, rotating back to 0 if we reach the end
+            currentIndex = (currentIndex + 1) % urls.length;
+            localStorage.setItem("currentUrlIndex", currentIndex);
 
             // Confirm sign-up and redirect to sharing page
             document.getElementById("message").textContent = "You have successfully signed up!";
-            window.location.href = "/share-3/form/";
+            window.location.href = "sharing.html";
         });
     </script>
 </body>
