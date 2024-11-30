@@ -3,55 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
+    <title>Sign Up for Beta</title>
+    <style>
+        input, button {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>Sign up for Early Access</h1>
+    <h1>Sign Up for Early Access</h1>
+
     <form id="signup-form">
-        <input type="email" id="email" placeholder="Enter your email" required>
-        <button type="submit">Sign Up</button>
+        <label for="email">Enter your Email Address:</label><br>
+        <input type="email" id="email" placeholder="Your Email" required><br>
+
+        <button type="button" id="signup-button">Sign Up</button>
     </form>
 
     <script>
-        document.getElementById('signup-form').addEventListener('submit', function(event) {
-            event.preventDefault();
+        // Landing page sign-up logic
+        document.getElementById('signup-button').addEventListener('click', function() {
+            const userEmail = document.getElementById('email').value;
             
-            const email = document.getElementById('email').value;
-            if (!email) return;
+            // Validate email
+            if (userEmail === "") {
+                alert("Please enter a valid email address.");
+                return;
+            }
 
-            // Generate a fingerprint for the user
-            const userId = generateFingerprint();
+            // Store the user's email and assign them a unique URL
+            localStorage.setItem('userEmail', userEmail);
 
-            // Save the email and fingerprint together
-            localStorage.setItem('userEmail_' + userId, email);
+            // Generate a unique URL for the user
+            let assignedUrlIndex = localStorage.getItem('assignedUrlIndex');
 
-            // Assign a unique URL to the user
-            assignUniqueUrl(userId);
+            // If no URL index has been assigned, initialize the list of URLs
+            if (!assignedUrlIndex) {
+                assignedUrlIndex = 0;
+                localStorage.setItem('assignedUrlIndex', assignedUrlIndex);
+            }
 
-            // Redirect to the sharing page after sign-up
-            window.location.href = "sharing.html";
-        });
-
-        function generateFingerprint() {
-            return navigator.userAgent + screen.width + screen.height + navigator.language;
-        }
-
-        function assignUniqueUrl(userId) {
+            // Define a list of predefined URLs
             const urls = [
                 "https://example.com/url1",
                 "https://example.com/url2",
                 "https://example.com/url3"
             ];
 
-            const assignedUrlIndex = localStorage.getItem('assignedUrlIndex_' + userId);
+            // Get the assigned URL based on the index
+            const assignedUrl = urls[assignedUrlIndex];
 
-            if (assignedUrlIndex === null) {
-                const randomIndex = Math.floor(Math.random() * urls.length);
-                localStorage.setItem('assignedUrlIndex_' + userId, randomIndex);
-                const url = urls[randomIndex];
-                localStorage.setItem('userUrl_' + userId, url);
-            }
-        }
+            // Store the assigned URL for this email
+            localStorage.setItem('assignedUrl', assignedUrl);
+
+            // Redirect the user to the sharing page with their unique URL
+            window.location.href = "sharing.html"; // Assuming your sharing page is named sharing.html
+        });
     </script>
 </body>
 </html>
