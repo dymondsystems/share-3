@@ -4,69 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
 <body>
-    <h1>Sign Up to Be Notified of Launch</h1>
+    <h1>Sign up for Early Access</h1>
     <form id="signup-form">
         <input type="email" id="email" placeholder="Enter your email" required>
         <button type="submit">Sign Up</button>
     </form>
 
     <script>
-        const urlList = ["url1", "url2", "url3", "url4", "url5"];
-        let currentUrlIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            if (!email) return;
 
-        // Generate a unique user ID using the current timestamp if it doesn't exist
-        function generateUserId() {
-            let userId = localStorage.getItem('userId');
-            if (!userId) {
-                userId = 'user-' + Date.now();
-                localStorage.setItem('userId', userId);
-            }
-            return userId;
-        }
+            // Generate a fingerprint for the user
+            const userId = generateFingerprint();
 
-        // Assign URL to the user based on the userId
-        function assignUrlToUser(userId) {
-            const userUrl = `${urlList[currentUrlIndex]}`;
-            localStorage.setItem(`userUrl_${userId}`, userUrl);
+            // Save the email and fingerprint together
+            localStorage.setItem('userEmail_' + userId, email);
 
-            // Increment URL index, wrap around if it exceeds length
-            currentUrlIndex = (currentUrlIndex + 1) % urlList.length;
-            localStorage.setItem("currentUrlIndex", currentUrlIndex);
-        }
+            // Assign a unique URL to the user
+            assignUniqueUrl(userId);
 
-        // Handle Sign-Up Form Submit
-        document.getElementById("signup-form").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const email = document.getElementById("email").value;
-            const userId = generateUserId();
-            assignUrlToUser(userId);
-            window.location.href = "form.html"; // Redirect to sharing page
+            // Redirect to the sharing page after sign-up
+            window.location.href = "sharing.html";
         });
+
+        function generateFingerprint() {
+            return navigator.userAgent + screen.width + screen.height + navigator.language;
+        }
+
+        function assignUniqueUrl(userId) {
+            const urls = [
+                "https://example.com/url1",
+                "https://example.com/url2",
+                "https://example.com/url3"
+            ];
+
+            const assignedUrlIndex = localStorage.getItem('assignedUrlIndex_' + userId);
+
+            if (assignedUrlIndex === null) {
+                const randomIndex = Math.floor(Math.random() * urls.length);
+                localStorage.setItem('assignedUrlIndex_' + userId, randomIndex);
+                const url = urls[randomIndex];
+                localStorage.setItem('userUrl_' + userId, url);
+            }
+        }
     </script>
 </body>
 </html>
