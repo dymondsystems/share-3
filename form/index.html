@@ -10,13 +10,15 @@
 
     <form id="email-form">
         <label for="name">Your Name:</label><br>
-        <input type="text" id="name" placeholder="Enter your name" required><br>
-        <label for="friend1">Friend's Email 1:</label><br>
-        <input type="email" id="friend1" placeholder="Friend's Email 1" required><br>
-        <label for="friend2">Friend's Email 2:</label><br>
-        <input type="email" id="friend2" placeholder="Friend's Email 2" required><br>
-        <label for="friend3">Friend's Email 3:</label><br>
-        <input type="email" id="friend3" placeholder="Friend's Email 3" required><br>
+        <input type="text" id="name" placeholder="Enter your name" required><br><br>
+        
+        <label for="friend1">Friend's Email 1 (optional):</label><br>
+        <input type="email" id="friend1" placeholder="Friend's Email 1"><br>
+        <label for="friend2">Friend's Email 2 (optional):</label><br>
+        <input type="email" id="friend2" placeholder="Friend's Email 2"><br>
+        <label for="friend3">Friend's Email 3 (optional):</label><br>
+        <input type="email" id="friend3" placeholder="Friend's Email 3"><br><br>
+
         <button type="button" id="generate-button">Generate Preview</button>
     </form>
 
@@ -24,47 +26,100 @@
     <textarea id="preview-message" rows="5" cols="50" readonly></textarea>
     <h2>Your Link</h2>
     <textarea id="link-only" rows="1" cols="50" readonly></textarea>
+
+    <h2>Share Options</h2>
+    <button id="sms-button" hidden>Share via SMS</button>
+    <button id="mailto-button" hidden>Share via Email</button>
+    <button id="whatsapp-button" hidden>Share via WhatsApp</button>
+    <button id="facebook-button" hidden>Share via Facebook</button>
+    <br><br>
     <button id="stats-button">View Stats</button>
 
     <script>
-        // Utility function to get cookies
+        // Utility to get cookies
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
             if (parts.length === 2) return parts.pop().split(";").shift();
         }
 
-        const fingerprint = getCookie("fingerprint");
-        const assignedUrl = localStorage.getItem(`url_${fingerprint}`);
+        // Retrieve the user's unique URL from localStorage
+        function getAssignedUrl() {
+            const fingerprint = getCookie("fingerprint");
+            if (!fingerprint) {
+                alert("No fingerprint found. Please sign up first.");
+                return null;
+            }
 
-        if (!fingerprint || !assignedUrl) {
-            alert("You do not have an assigned URL. Please sign up to generate your unique link.");
+            const url = localStorage.getItem(`url_${fingerprint}`);
+            if (!url) {
+                alert("No URL assigned to your account. Please sign up.");
+                return null;
+            }
+
+            return url;
         }
 
+        const assignedUrl = getAssignedUrl();
+        if (!assignedUrl) {
+            // Redirect the user back to the signup page if no URL is found
+            window.location.href = "signup.html";
+        }
+
+        // Event listener for generating the preview
         document.getElementById("generate-button").addEventListener("click", () => {
             const name = document.getElementById("name").value;
             const friend1 = document.getElementById("friend1").value;
             const friend2 = document.getElementById("friend2").value;
             const friend3 = document.getElementById("friend3").value;
 
-            if (!name || !friend1 || !friend2 || !friend3) {
-                alert("Please fill in all fields.");
+            if (!name) {
+                alert("Please enter your name.");
                 return;
             }
 
+            // Generate URLs
             const urlWithName = `${assignedUrl}?name=${encodeURIComponent(name)}`;
             const statsUrl = `${assignedUrl}.stats`;
 
-            const message = `Hey! I've joined this amazing beta access program. You can join too! Use my referral link: ${urlWithName}`;
+            // Generate Messages
+            const message = `Hey! I've joined this amazing beta access program. Use my referral link to join: ${urlWithName}`;
             const mailtoMessage = `mailto:${friend1},${friend2},${friend3}?subject=Join the Beta Program&body=${encodeURIComponent(
                 message
             )}`;
 
+            // Populate preview areas
             document.getElementById("preview-message").value = message;
             document.getElementById("link-only").value = urlWithName;
 
-            // Generate share buttons
-            document.getElementById("stats-button").onclick = () => {
+            // Show and assign share buttons
+            const smsButton = document.getElementById("sms-button");
+            smsButton.hidden = false;
+            smsButton.onclick = () => {
+                window.location.href = `sms:?&body=${encodeURIComponent(message)}`;
+            };
+
+            const mailtoButton = document.getElementById("mailto-button");
+            mailtoButton.hidden = false;
+            mailtoButton.onclick = () => {
+                window.location.href = mailtoMessage;
+            };
+
+            const whatsappButton = document.getElementById("whatsapp-button");
+            whatsappButton.hidden = false;
+            whatsappButton.onclick = () => {
+                window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+            };
+
+            const facebookButton = document.getElementById("facebook-button");
+            facebookButton.hidden = false;
+            facebookButton.onclick = () => {
+                window.location.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlWithName)}`;
+            };
+
+            // Assign stats button
+            const statsButton = document.getElementById("stats-button");
+            statsButton.onclick = () => {
                 window.location.href = statsUrl;
             };
         });
