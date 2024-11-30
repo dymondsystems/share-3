@@ -3,22 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Share Your Unique Link</title>
+  <title>Sign Up for Beta</title>
 </head>
 <body>
-  <h1>Share Your Unique Link</h1>
-
-  <form id="share-form">
-    <label for="name">Your Name:</label>
-    <input type="text" id="name" placeholder="Enter your name"><br><br>
-
-    <button type="button" id="generate-button">Generate Preview</button>
+  <h1>Sign Up for Beta Launch</h1>
+  
+  <form id="signup-form">
+    <label for="email">Email:</label>
+    <input type="email" id="email" required placeholder="Enter your email">
+    <button type="submit">Sign Up</button>
   </form>
-
-  <h2>Share Options</h2>
-  <textarea id="message-preview" readonly></textarea><br>
-  <textarea id="link-only" readonly></textarea><br>
-  <button id="stats-button">View Stats</button><br>
 
   <script>
     // Utility function to get a cookie
@@ -26,67 +20,36 @@
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
       if (parts.length === 2) return parts.pop().split(";").shift();
+      return null;
     }
 
-    // Utility function to check if user is already signed up
-    function checkSignUp() {
-      if (!localStorage.getItem('userEmail') && !getCookie('userFingerprint')) {
-        window.location.href = "signup.html"; // Redirect to signup if not signed up
-      }
-    }
+    // Handle user sign-up form submission
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
 
-    // Check if user is signed up
-    checkSignUp();
-
-    // Get user fingerprint and email
-    const fingerprint = getCookie('userFingerprint');
-    const userEmail = localStorage.getItem('userEmail');
-
-    if (!fingerprint || !userEmail) {
-      alert("Something went wrong, please sign up first.");
-      window.location.href = "signup.html"; // Redirect to signup page if fingerprint or email not found
-    }
-
-    // Store URLs in a predefined list
-    const urls = [
-      "https://example.com/url1",
-      "https://example.com/url2",
-      "https://example.com/url3"
-    ];
-
-    // Assign URL based on fingerprint (store the URL once assigned)
-    function assignUrl() {
-      let assignedUrl = localStorage.getItem(`url_${fingerprint}`);
-
-      if (!assignedUrl) {
-        const randomIndex = Math.floor(Math.random() * urls.length);
-        assignedUrl = urls[randomIndex];
-        localStorage.setItem(`url_${fingerprint}`, assignedUrl);
+      // Check if email is already saved
+      if (localStorage.getItem('userEmail') || getCookie('userFingerprint')) {
+        return; // Redirect to sharing page if email exists
       }
 
-      return assignedUrl;
+      // Store email and fingerprint (use fingerprint for URL assignment)
+      localStorage.setItem('userEmail', email);
+      const fingerprint = generateFingerprint();
+      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`; // Store fingerprint in cookie for 48 hours
+
+      // Debugging output
+      console.log('Email saved to localStorage:', email);
+      console.log('Fingerprint saved to cookie:', fingerprint);
+
+      // Redirect to sharing page after successful signup
+      window.location.href = 'sharing.html';
+    });
+
+    // Function to generate a fingerprint (using device-specific data)
+    function generateFingerprint() {
+      return `${navigator.userAgent}${screen.width}${screen.height}${navigator.language}`;
     }
-
-    // Generate preview message
-    document.getElementById('generate-button').addEventListener('click', () => {
-      const nameInput = document.getElementById("name");
-      const messageBox = document.getElementById("message-preview");
-      const linkBox = document.getElementById("link-only");
-
-      const name = nameInput.value || "user";
-      const assignedUrl = assignUrl();
-      const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
-
-      // Populate the message preview box
-      messageBox.value = `Check out this amazing site: ${personalizedUrl}`;
-      linkBox.value = personalizedUrl;
-    });
-
-    // Stats button functionality
-    document.getElementById("stats-button").addEventListener("click", () => {
-      const assignedUrl = assignUrl();
-      window.location.href = `${assignedUrl}.stats`;
-    });
   </script>
 </body>
 </html>
