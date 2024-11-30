@@ -1,94 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign-Up Page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
 </head>
 <body>
-    <h1>Sign Up for Beta Access</h1>
+  <h1>Sign Up for Early Access</h1>
+  <form id="signup-form">
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <button type="button" id="signup-button">Sign Up</button>
+  </form>
+  <p id="message"></p>
 
-    <form id="signup-form">
-        <label for="email">Your Email:</label><br>
-        <input type="email" id="email" placeholder="Enter your email" required><br><br>
-        <button type="button" id="signup-button">Sign Up</button>
-    </form>
+  <script>
+    const urls = [
+      "https://example.com/url1",
+      "https://example.com/url2",
+      "https://example.com/url3"
+    ];
 
-    <p id="message"></p>
+    function generateFingerprint() {
+      return `${navigator.userAgent}_${screen.width}x${screen.height}_${Date.now()}`;
+    }
 
-    <script>
-        // List of predefined URLs
-        const urls = [
-            "https://example.com/url1",
-            "https://example.com/url2",
-            "https://example.com/url3",
-            "https://example.com/url4",
-            "https://example.com/url5"
-        ];
+    function getOrSetUrl(fingerprint) {
+      const existingUrl = localStorage.getItem(`url_${fingerprint}`);
+      if (existingUrl) return existingUrl;
 
-        // Utility to generate a fingerprint
-        function generateFingerprint() {
-            return `${navigator.userAgent}_${screen.width}x${screen.height}_${Date.now()}`;
-        }
+      let currentIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
+      if (currentIndex >= urls.length) {
+        document.getElementById("message").textContent = "No more URLs available.";
+        return null;
+      }
 
-        // Utility to set a cookie
-        function setCookie(name, value, days) {
-            const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-            document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-        }
+      const assignedUrl = urls[currentIndex];
+      localStorage.setItem(`url_${fingerprint}`, assignedUrl);
+      currentIndex = (currentIndex + 1) % urls.length;
+      localStorage.setItem("currentUrlIndex", currentIndex);
 
-        // Utility to get a cookie
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(";").shift();
-        }
+      return assignedUrl;
+    }
 
-        // Handle sign-up logic
-        document.getElementById("signup-button").addEventListener("click", () => {
-            const email = document.getElementById("email").value;
-            if (!email) {
-                document.getElementById("message").textContent = "Please enter a valid email.";
-                return;
-            }
+    document.getElementById("signup-button").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      if (!email) {
+        document.getElementById("message").textContent = "Please enter a valid email.";
+        return;
+      }
 
-            // Generate or retrieve fingerprint
-            let fingerprint = getCookie("fingerprint");
-            if (!fingerprint) {
-                fingerprint = generateFingerprint();
-                setCookie("fingerprint", fingerprint, 2); // Set cookie for 2 days
-            }
+      const fingerprint = generateFingerprint();
+      const assignedUrl = getOrSetUrl(fingerprint);
 
-            // Check if the user already has an assigned URL
-            const existingUrl = localStorage.getItem(`url_${fingerprint}`);
-            if (existingUrl) {
-                document.getElementById("message").textContent = "You are already signed up!";
-                window.location.href = "sharing.html";
-                return;
-            }
-
-            // Retrieve the current URL index or initialize it
-            let currentIndex = parseInt(localStorage.getItem("currentUrlIndex")) || 0;
-
-            // Assign the next URL in rotation
-            const nextUrl = urls[currentIndex];
-
-            if (!nextUrl) {
-                document.getElementById("message").textContent = "No more URLs available. Please try again later.";
-                return;
-            }
-
-            // Save assigned URL to localStorage
-            localStorage.setItem(`url_${fingerprint}`, nextUrl);
-
-            // Increment and store the new index, rotating back to 0 if we reach the end
-            currentIndex = (currentIndex + 1) % urls.length;
-            localStorage.setItem("currentUrlIndex", currentIndex);
-
-            // Confirm sign-up and redirect to sharing page
-            document.getElementById("message").textContent = "You have successfully signed up!";
-            window.location.href = "/share-3/form/";
-        });
-    </script>
+      if (assignedUrl) {
+        document.cookie = `fingerprint=${fingerprint}; path=/; max-age=172800`; // 48 hours
+        window.location.href = `https://dymond.systems/share-3/form`;
+      }
+    });
+  </script>
 </body>
 </html>
