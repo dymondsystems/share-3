@@ -49,11 +49,12 @@
         return;
       }
 
+      const nameInput = document.getElementById("name");
       const messageBox = document.getElementById("message-preview");
       const linkBox = document.getElementById("link-only");
 
-      const name = document.getElementById("name").value || "user";
-      const personalizedUrl = `${assignedUrl}?name=${name}`;
+      const name = nameInput.value || "user";
+      const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
 
       messageBox.value = `Check out this amazing site: ${personalizedUrl}`;
       linkBox.value = personalizedUrl;
