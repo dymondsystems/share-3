@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Share Your Link</title>
+  <title>Share Your Unique Link</title>
 </head>
 <body>
   <h1>Share Your Unique Link</h1>
@@ -30,6 +30,7 @@
   <button id="stats-button">View Stats</button><br>
 
   <script>
+    // Function to get the value of a cookie by its name
     function getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -38,18 +39,23 @@
 
     function loadSharingInfo() {
       const fingerprint = getCookie("fingerprint");
+
+      // Check if the fingerprint is present (i.e., user is recognized)
       if (!fingerprint) {
-        window.location.href = "signup.html";
+        window.location.href = "signup.html"; // Redirect if no fingerprint
         return;
       }
 
-      // Fetch the assigned URL based on the fingerprint
+      // Fetch the assigned URL for this fingerprint
       const assignedUrl = localStorage.getItem(`url_${fingerprint}`);
+
+      // If URL not found for this fingerprint, redirect to signup page
       if (!assignedUrl) {
-        window.location.href = "signup.html";
+        window.location.href = "signup.html"; // Redirect if URL not assigned
         return;
       }
 
+      // On form submission, generate the preview message
       const nameInput = document.getElementById("name");
       const messageBox = document.getElementById("message-preview");
       const linkBox = document.getElementById("link-only");
@@ -58,7 +64,7 @@
         const name = nameInput.value || "user";
         const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
 
-        // Populate preview areas
+        // Populate the message preview box
         messageBox.value = `Check out this amazing site: ${personalizedUrl}`;
         linkBox.value = personalizedUrl;
       });
@@ -69,7 +75,7 @@
       });
     }
 
-    // Call on page load
+    // Call loadSharingInfo when the page loads
     loadSharingInfo();
   </script>
 </body>
