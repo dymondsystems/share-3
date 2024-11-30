@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invite Friends</title>
+
 </head>
 <body>
     <h1>Invite Your Friends</h1>
+    <button id="sign-out-button" style="background: red; color: white;">Sign Out</button>
     <form id="invite-form">
         <label for="name">Your Name:</label>
         <input type="text" id="name" required>
@@ -35,7 +37,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const userUrl = localStorage.getItem("userUrl");
     if (!userUrl) {
-        window.location.href = "share-3";
+        window.location.href = "share-3/";
         return;
     }
 
@@ -73,6 +75,21 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("stats-button").onclick = () => {
             window.location.href = `${userUrl}.stats`;
         };
+        document.getElementById("sign-out-button").addEventListener("click", () => {
+    // Clear localStorage keys for the session
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userUrl");
+
+    // Optionally clear other session-related data
+    localStorage.removeItem("currentIndex");
+
+    // Clear cookies (if used)
+    document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+    // Redirect to landing page
+    window.location.href = "share-3/";
+});
+
     });
 });
 
