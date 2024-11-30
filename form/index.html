@@ -3,110 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Share Your Invite</title>
-    <style>
-        input, button, textarea {
-            margin-bottom: 10px;
-            padding: 8px;
-            width: 300px;
-        }
-    </style>
+    <title>Sharing Page</title>
 </head>
 <body>
-    <h1>Your Unique Share Link</h1>
+    <h1>Share the Beta Access</h1>
 
-    <form id="share-form">
+    <form id="email-form">
         <label for="name">Your Name:</label><br>
         <input type="text" id="name" placeholder="Enter your name" required><br>
-
-        <label for="email1">Friend 1 Email:</label><br>
-        <input type="email" id="email1" placeholder="Friend 1 Email" required><br>
-
-        <label for="email2">Friend 2 Email:</label><br>
-        <input type="email" id="email2" placeholder="Friend 2 Email"><br>
-
-        <label for="email3">Friend 3 Email:</label><br>
-        <input type="email" id="email3" placeholder="Friend 3 Email"><br>
-
-        <button type="button" id="generate-preview">Generate Preview</button>
+        <label for="friend1">Friend's Email 1:</label><br>
+        <input type="email" id="friend1" placeholder="Friend's Email 1" required><br>
+        <label for="friend2">Friend's Email 2:</label><br>
+        <input type="email" id="friend2" placeholder="Friend's Email 2" required><br>
+        <label for="friend3">Friend's Email 3:</label><br>
+        <input type="email" id="friend3" placeholder="Friend's Email 3" required><br>
+        <button type="button" id="generate-button">Generate Preview</button>
     </form>
 
-    <h2>Preview:</h2>
-    <textarea id="message-preview" rows="4" cols="50" readonly></textarea><br>
-
-    <h2>Your Link Only:</h2>
-    <textarea id="link-only" rows="2" cols="50" readonly></textarea><br>
-
-    <h2>Share Your Invite:</h2>
-    <a id="sms-button" href="#">Share via SMS</a><br>
-    <a id="email-button" href="#">Share via Email</a><br>
-    <a id="whatsapp-button" href="#">Share via WhatsApp</a><br>
-    <a id="facebook-button" href="#">Share via Facebook</a><br>
-    
-    <h2>Stats:</h2>
-    <a id="stats-button" href="#">View Stats</a><br>
+    <h2>Preview Message</h2>
+    <textarea id="preview-message" rows="5" cols="50" readonly></textarea>
+    <h2>Your Link</h2>
+    <textarea id="link-only" rows="1" cols="50" readonly></textarea>
+    <button id="stats-button">View Stats</button>
 
     <script>
-        // Array of pre-defined URLs
-        const urls = [
-            "https://example.com/url1",
-            "https://example.com/url2",
-            "https://example.com/url3"
-        ];
-
-        // Get the user's email from localStorage
-        const userEmail = localStorage.getItem('userEmail');
-
-        if (!userEmail) {
-            // If no email is found, redirect to the landing page
-            window.location.href = 'index.html';
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(";").shift();
         }
 
-        // Assign a unique URL to the user
-        let assignedUrlIndex = localStorage.getItem('assignedUrlIndex');
+        const fingerprint = getCookie("fingerprint");
+        const assignedUrl = localStorage.getItem(`url_${fingerprint}`);
 
-        if (!assignedUrlIndex) {
-            // If no URL assigned, assign the first URL from the list
-            assignedUrlIndex = 0;
-            localStorage.setItem('assignedUrlIndex', assignedUrlIndex);
+        if (!fingerprint || !assignedUrl) {
+            window.location.href = "signup.html";
         }
 
-        // Get the URL assigned to this user
-        const assignedUrl = urls[assignedUrlIndex];
+        document.getElementById("generate-button").addEventListener("click", () => {
+            const name = document.getElementById("name").value;
+            const friend1 = document.getElementById("friend1").value;
+            const friend2 = document.getElementById("friend2").value;
+            const friend3 = document.getElementById("friend3").value;
 
-        // Define the generate preview button functionality
-        document.getElementById('generate-preview').addEventListener('click', function() {
-            const name = document.getElementById('name').value;
-            const email1 = document.getElementById('email1').value;
-            const email2 = document.getElementById('email2').value;
-            const email3 = document.getElementById('email3').value;
+            if (!name || !friend1 || !friend2 || !friend3) {
+                alert("Please fill in all fields.");
+                return;
+            }
 
-            // Append the user's name to the URL
-            const userLink = `${assignedUrl}?name=${encodeURIComponent(name)}`;
+            const urlWithName = `${assignedUrl}?name=${encodeURIComponent(name)}`;
+            const statsUrl = `${assignedUrl}.stats`;
 
-            // Create the preview message
-            const previewMessage = `Hi! Join me at ${userLink}\n\nFriend 1: ${email1}\nFriend 2: ${email2}\nFriend 3: ${email3}`;
+            const message = `Hey! I've joined this amazing beta access program. You can join too! Use my referral link: ${urlWithName}`;
+            const mailtoMessage = `mailto:${friend1},${friend2},${friend3}?subject=Join the Beta Program&body=${encodeURIComponent(
+                message
+            )}`;
 
-            // Display the preview message
-            document.getElementById('message-preview').value = previewMessage;
+            document.getElementById("preview-message").value = message;
+            document.getElementById("link-only").value = urlWithName;
 
-            // Display just the URL in the link-only textarea
-            document.getElementById('link-only').value = userLink;
-
-            // Setup the share buttons with the link
-            const smsMessage = `sms:?body=${encodeURIComponent(previewMessage)}`;
-            const emailMessage = `mailto:?subject=Join Us&body=${encodeURIComponent(previewMessage)}`;
-            const whatsappMessage = `https://wa.me/?text=${encodeURIComponent(previewMessage)}`;
-            const facebookMessage = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(userLink)}`;
-
-            // Set up the share buttons
-            document.getElementById('sms-button').href = smsMessage;
-            document.getElementById('email-button').href = emailMessage;
-            document.getElementById('whatsapp-button').href = whatsappMessage;
-            document.getElementById('facebook-button').href = facebookMessage;
-
-            // Set up the stats link
-            document.getElementById('stats-button').href = userLink + ".stats";
+            // Generate share buttons
+            document.getElementById("stats-button").onclick = () => {
+                window.location.href = statsUrl;
+            };
         });
     </script>
 </body>
