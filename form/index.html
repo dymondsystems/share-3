@@ -4,52 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share Your Invite</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        textarea, input {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 10px;
-            font-size: 16px;
-        }
-        button, a {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            text-align: center;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        button:hover, a:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
 <body>
     <h1>Share with Friends</h1>
-    <textarea id="user-link" readonly></textarea>
 
-    <h2>Invite Your Friends</h2>
-    <input type="text" id="name" placeholder="Enter your name" required>
-    <input type="email" id="friend-email-1" placeholder="Friend's Email 1" required>
-    <input type="email" id="friend-email-2" placeholder="Friend's Email 2" required>
-    <input type="email" id="friend-email-3" placeholder="Friend's Email 3" required>
+    <p id="user-link"></p>
+    <input type="text" id="name" placeholder="Enter your name">
+    <input type="email" id="friend-email-1" placeholder="Friend's Email 1">
+    <input type="email" id="friend-email-2" placeholder="Friend's Email 2">
+    <input type="email" id="friend-email-3" placeholder="Friend's Email 3">
+
+    <button id="generate-preview">Generate Preview</button>
 
     <h3>Preview Message:</h3>
     <textarea id="preview-message" readonly></textarea>
-
-    <button id="generate-preview">Generate Preview</button>
 
     <h2>Share Options</h2>
     <a id="sms-button" href="#">Share via SMS</a>
@@ -60,35 +28,33 @@
     <button id="stats-button">View Stats</button>
 
     <script>
-        // Handle Sharing Page
-        document.addEventListener("DOMContentLoaded", () => {
-            const userId = localStorage.getItem('userId');
-            const userUrl = localStorage.getItem(`userUrl_${userId}`);
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = generateFingerprint();
+            const userUrl = localStorage.getItem('userUrl_' + userId);
 
-            if (!userUrl) {
-                window.location.href = "index.html"; // Redirect if no URL is assigned
+            if (userUrl) {
+                // Display the assigned URL
+                document.getElementById('user-link').textContent = userUrl;
+            } else {
+                window.location.href = "index.html"; // Redirect if no URL found
             }
 
-            document.getElementById("user-link").value = userUrl;
-
-            // Generate message preview
             document.getElementById("generate-preview").addEventListener("click", () => {
                 const name = document.getElementById("name").value;
-                const previewMessage = `Hi, ${name} has invited you to check this out: ${userUrl}`;
-                document.getElementById("preview-message").value = previewMessage;
+                const urlWithName = `${userUrl}?name=${encodeURIComponent(name)}`;
+                document.getElementById("preview-message").value = `Hi, ${name} has invited you to check this out: ${urlWithName}`;
 
                 // Set share links
                 document.getElementById("sms-button").href = `sms:?body=${encodeURIComponent(previewMessage)}`;
                 document.getElementById("email-button").href = `mailto:?subject=Join us&body=${encodeURIComponent(previewMessage)}`;
                 document.getElementById("whatsapp-button").href = `https://wa.me/?text=${encodeURIComponent(previewMessage)}`;
-                document.getElementById("facebook-button").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(userUrl)}`;
-            });
-
-            // Stats button
-            document.getElementById("stats-button").addEventListener("click", () => {
-                window.location.href = `${userUrl}.stats`; // Redirect to stats page
+                document.getElementById("facebook-button").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlWithName)}`;
             });
         });
+
+        function generateFingerprint() {
+            return navigator.userAgent + screen.width + screen.height + navigator.language;
+        }
     </script>
 </body>
 </html>
