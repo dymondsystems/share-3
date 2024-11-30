@@ -15,6 +15,21 @@
   </form>
 
   <script>
+
+// Utility function to check if user is signed in
+    function checkSignIn() {
+      // Check if email is in localStorage (user is signed in)
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (userEmail) {
+        // If signed in, redirect to the dashboard page
+        window.location.href = "dashboard.html";
+      }
+    }
+
+
+
+    
     // Utility function to get a cookie
     function getCookie(name) {
       const value = `; ${document.cookie}`;
