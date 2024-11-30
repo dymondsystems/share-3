@@ -1,70 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Early Access Signup</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
 </head>
 <body>
-  <div id="signupForm">
-    <h2>Sign Up for Early Access</h2>
-    <label for="name">Your Name:</label>
-    <input type="text" id="name" name="name" required>
-    <label for="email">Your Email:</label>
-    <input type="email" id="email" name="email" required>
-    <button type="submit">Sign Up</button>
-  </div>
+    <h1>Sign Up for Beta Access</h1>
+    <form id="signup-form">
+        <label for="email">Enter your email:</label><br>
+        <input type="email" id="email" required><br>
+        <button type="button" id="signup-button">Sign Up</button>
+    </form>
 
-  <div id="mainForm" style="display: none;">
-    <h2>Share Your Invite</h2>
-    <p>Your unique link: <span id="shareLink"></span></p>
+    <script>
+        const urls = [
+            "https://example.com/url1",
+            "https://example.com/url2",
+            "https://example.com/url3"
+        ];
 
-    <label for="friendEmail1">Friend's Email 1:</label>
-    <input type="email" id="friendEmail1" name="friendEmail1">
+        const cookieExpiryHours = 48;
 
-    <label for="friendEmail2">Friend's Email 2:</label>
-    <input type="email" id="friendEmail2" name="friendEmail2">
+        function generateFingerprint() {
+            return (
+                navigator.userAgent +
+                screen.width +
+                screen.height +
+                navigator.language
+            );
+        }
 
-    <label for="friendEmail3">Friend's Email 3:</label>
-    <input type="email" id="friendEmail3" name="friendEmail3">
+        function setCookie(name, value, hours) {
+            const d = new Date();
+            d.setTime(d.getTime() + hours * 60 * 60 * 1000);
+            document.cookie = `${name}=${value}; expires=${d.toUTCString()}; path=/`;
+        }
 
-    <button id="sendEmailButton">Send Email Invite</button>
-    <button id="sendSMSButton">Send SMS Invite</button>
-  </div>
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(";").shift();
+        }
 
-  <script>
-    const signupForm = document.getElementById('signupForm');
-    const mainForm = document.getElementById('mainForm');
-    const shareLinkElement = document.getElementById('shareLink');
-    const sendEmailButton = document.getElementById('sendEmailButton');
-    const sendSMSButton = document.getElementById('sendSMSButton');
+        document.getElementById("signup-button").addEventListener("click", () => {
+            const email = document.getElementById("email").value;
+            if (!email) {
+                alert("Please enter a valid email.");
+                return;
+            }
 
-    const baseUrls = [
-      "https://example.com/share1",
-      "https://example.com/share2",
-      "https://example.com/share3",
-    ];
+            const fingerprint = generateFingerprint();
+            let assignedUrl = localStorage.getItem(`url_${fingerprint}`);
 
-    let currentUrlIndex = 0;
+            // Redirect returning user
+            if (assignedUrl) {
+                window.location.href = "sharing.html";
+                return;
+            }
 
-    signupForm.addEventListener('submit', (event) => {
-      event.preventDefault();
+            // Get the next available URL
+            let assignedUrlIndex = parseInt(localStorage.getItem("urlIndex")) || 0;
+            if (assignedUrlIndex >= urls.length) {
+                alert("No more URLs available.");
+                window.location.href = "/dashboard.html"; // Redirect to dashboard if URLs are exhausted
+                return;
+            }
 
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
+            assignedUrl = urls[assignedUrlIndex];
+            localStorage.setItem(`url_${fingerprint}`, assignedUrl);
+            localStorage.setItem("urlIndex", assignedUrlIndex + 1);
 
-      localStorage.setItem('userEmail', email);
+            // Store email and set cookie
+            localStorage.setItem("email", email);
+            setCookie("fingerprint", fingerprint, cookieExpiryHours);
 
-      signupForm.style.display = 'none';
-      mainForm.style.display = 'block';
+            window.location.href = "sharing.html";
+        });
 
-      const baseUrl = baseUrls[currentUrlIndex];
-      const url = baseUrl + '?name=' + encodeURIComponent(name);
-
-      shareLinkElement.textContent = url;
-
-      currentUrlIndex++;
-    });
-
-    // ... (rest of the code for email and SMS buttons)
-  </script>
+        // Redirect if user already signed in
+        const fingerprint = getCookie("fingerprint");
+        if (fingerprint && localStorage.getItem(`url_${fingerprint}`)) {
+            window.location.href = "sharing.html";
+        }
+    </script>
 </body>
 </html>
