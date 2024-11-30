@@ -65,7 +65,7 @@
         document.cookie = `fingerprint=${fingerprint}; path=/; max-age=172800`; // 48 hours
         document.getElementById("message").textContent = `You have been assigned: ${assignedUrl}`;
         setTimeout(() => {
-          window.location.href = `sharing.html`;
+          window.location.href = `/form/`;
         }, 2000);
       }
     });
