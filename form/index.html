@@ -12,15 +12,6 @@
     <label for="name">Your Name:</label>
     <input type="text" id="name" placeholder="Enter your name"><br><br>
 
-    <label for="friend1">Friend's Email 1:</label>
-    <input type="email" id="friend1" placeholder="Friend's Email 1"><br><br>
-
-    <label for="friend2">Friend's Email 2:</label>
-    <input type="email" id="friend2" placeholder="Friend's Email 2"><br><br>
-
-    <label for="friend3">Friend's Email 3:</label>
-    <input type="email" id="friend3" placeholder="Friend's Email 3"><br><br>
-
     <button type="button" id="generate-button">Generate Preview</button>
   </form>
 
@@ -30,53 +21,72 @@
   <button id="stats-button">View Stats</button><br>
 
   <script>
-    // Function to get the value of a cookie by its name
+    // Utility function to get a cookie
     function getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
       if (parts.length === 2) return parts.pop().split(";").shift();
     }
 
-    function loadSharingInfo() {
-      const fingerprint = getCookie("fingerprint");
-
-      // Check if the fingerprint is present (i.e., user is recognized)
-      if (!fingerprint) {
-        window.location.href = "signup.html"; // Redirect if no fingerprint
-        return;
+    // Utility function to check if user is already signed up
+    function checkSignUp() {
+      if (!localStorage.getItem('userEmail') && !getCookie('userFingerprint')) {
+        window.location.href = "signup.html"; // Redirect to signup if not signed up
       }
+    }
 
-      // Fetch the assigned URL for this fingerprint
-      const assignedUrl = localStorage.getItem(`url_${fingerprint}`);
+    // Check if user is signed up
+    checkSignUp();
 
-      // If URL not found for this fingerprint, redirect to signup page
+    // Get user fingerprint and email
+    const fingerprint = getCookie('userFingerprint');
+    const userEmail = localStorage.getItem('userEmail');
+
+    if (!fingerprint || !userEmail) {
+      alert("Something went wrong, please sign up first.");
+      window.location.href = "signup.html"; // Redirect to signup page if fingerprint or email not found
+    }
+
+    // Store URLs in a predefined list
+    const urls = [
+      "https://example.com/url1",
+      "https://example.com/url2",
+      "https://example.com/url3"
+    ];
+
+    // Assign URL based on fingerprint (store the URL once assigned)
+    function assignUrl() {
+      let assignedUrl = localStorage.getItem(`url_${fingerprint}`);
+
       if (!assignedUrl) {
-        window.location.href = "signup.html"; // Redirect if URL not assigned
-        return;
+        const randomIndex = Math.floor(Math.random() * urls.length);
+        assignedUrl = urls[randomIndex];
+        localStorage.setItem(`url_${fingerprint}`, assignedUrl);
       }
 
-      // On form submission, generate the preview message
+      return assignedUrl;
+    }
+
+    // Generate preview message
+    document.getElementById('generate-button').addEventListener('click', () => {
       const nameInput = document.getElementById("name");
       const messageBox = document.getElementById("message-preview");
       const linkBox = document.getElementById("link-only");
 
-      document.getElementById("generate-button").addEventListener("click", () => {
-        const name = nameInput.value || "user";
-        const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
+      const name = nameInput.value || "user";
+      const assignedUrl = assignUrl();
+      const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
 
-        // Populate the message preview box
-        messageBox.value = `Check out this amazing site: ${personalizedUrl}`;
-        linkBox.value = personalizedUrl;
-      });
+      // Populate the message preview box
+      messageBox.value = `Check out this amazing site: ${personalizedUrl}`;
+      linkBox.value = personalizedUrl;
+    });
 
-      // Stats button functionality
-      document.getElementById("stats-button").addEventListener("click", () => {
-        window.location.href = `${assignedUrl}.stats`;
-      });
-    }
-
-    // Call loadSharingInfo when the page loads
-    loadSharingInfo();
+    // Stats button functionality
+    document.getElementById("stats-button").addEventListener("click", () => {
+      const assignedUrl = assignUrl();
+      window.location.href = `${assignedUrl}.stats`;
+    });
   </script>
 </body>
 </html>
