@@ -36,6 +36,7 @@
         const fingerprint = getCookie("fingerprint");
         const assignedUrl = localStorage.getItem(`url_${fingerprint}`);
 
+        // Redirect logic
         if (!fingerprint || !assignedUrl) {
             window.location.href = "signup.html";
         }
