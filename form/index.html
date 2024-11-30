@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invite Friends</title>
+</head>
+<body>
+    <h1>Invite Your Friends</h1>
+    <form id="invite-form">
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" required>
+        <label for="friend1">Friend's Email 1:</label>
+        <input type="email" id="friend1">
+        <label for="friend2">Friend's Email 2:</label>
+        <input type="email" id="friend2">
+        <label for="friend3">Friend's Email 3:</label>
+        <input type="email" id="friend3">
+        <button type="submit">Generate Links</button>
+    </form>
+    <div id="share-section" style="display: none;">
+        <textarea id="message-preview" readonly></textarea>
+        <textarea id="raw-link" readonly></textarea>
+        <button id="sms-button">Share via SMS</button>
+        <button id="email-button">Share via Email</button>
+        <button id="whatsapp-button">Share via WhatsApp</button>
+        <button id="facebook-button">Share via Facebook</button>
+        <button id="stats-button">View Stats</button>
+    </div>
+    <script src="form.js"></script>
+</body>
+</html>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const userUrl = localStorage.getItem("userUrl");
+    if (!userUrl) {
+        window.location.href = "share-3";
+        return;
+    }
+
+    document.getElementById("invite-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const name = encodeURIComponent(document.getElementById("name").value);
+        const friend1 = document.getElementById("friend1").value;
+        const friend2 = document.getElementById("friend2").value;
+        const friend3 = document.getElementById("friend3").value;
+
+        const personalizedUrl = `${userUrl}?ref=${name}`;
+        const shareMessage = `Hi! ${decodeURIComponent(name)} is inviting you to check this out: ${personalizedUrl}`;
+
+        // Update the preview and raw link
+        document.getElementById("share-section").style.display = "block";
+        document.getElementById("message-preview").value = shareMessage;
+        document.getElementById("raw-link").value = personalizedUrl;
+
+        // Generate share links
+        document.getElementById("sms-button").onclick = () => {
+            window.location.href = `sms:?body=${encodeURIComponent(shareMessage)}`;
+        };
+        document.getElementById("email-button").onclick = () => {
+            window.location.href = `mailto:${[friend1, friend2, friend3].filter(Boolean).join(",")}?subject=Invitation&body=${encodeURIComponent(shareMessage)}`;
+        };
+        document.getElementById("whatsapp-button").onclick = () => {
+            window.location.href = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
+        };
+        document.getElementById("facebook-button").onclick = () => {
+            window.location.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`;
+        };
+
+        // Stats button
+        document.getElementById("stats-button").onclick = () => {
+            window.location.href = `${userUrl}.stats`;
+        };
+    });
+});
+
+</script>
