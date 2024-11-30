@@ -17,18 +17,17 @@
 </html>
 
 <script>
-// Premade URLs
+// List of URLs to be assigned
 const urls = ["url1", "url2", "url3"]; // Add more URLs as needed
-let currentIndex = parseInt(localStorage.getItem("currentIndex")) || 0;
 
-// Check if user is returning
+// Check for returning users
 document.addEventListener("DOMContentLoaded", () => {
     const userEmail = localStorage.getItem("userEmail");
     const userUrl = localStorage.getItem("userUrl");
 
     if (userEmail && userUrl) {
-        // Redirect returning user
-        window.location.href = "https://dymond.systems/share-3/form/";
+        // Redirect returning user to the form page
+        window.location.href = "/form/";
         return;
     }
 });
@@ -39,27 +38,43 @@ document.getElementById("signup-form").addEventListener("submit", (event) => {
     const email = document.getElementById("email").value;
     const storedEmail = localStorage.getItem("userEmail");
 
+    // Check if this email has already signed up and assigned a URL
     if (storedEmail === email) {
-        // Redirect returning user
-        window.location.href = "returning.html";
+        // Redirect to form page if user already signed up
+        window.location.href = "/form/";
         return;
     }
 
-    if (currentIndex >= urls.length) {
-        // Redirect if no more URLs
+    // Retrieve the assigned URLs from localStorage, or initialize an empty array
+    let assignedUrls = JSON.parse(localStorage.getItem("assignedUrls")) || [];
+
+    // Find the next available URL
+    let availableUrl = null;
+    for (let url of urls) {
+        if (!assignedUrls.includes(url)) {
+            availableUrl = url;
+            break;
+        }
+    }
+
+    if (!availableUrl) {
+        // Redirect if no URLs are available
         window.location.href = "no-urls.html";
         return;
     }
 
-    // Assign a new URL
-    const userUrl = urls[currentIndex];
+    // Assign the available URL to the user
     localStorage.setItem("userEmail", email);
-    localStorage.setItem("userUrl", userUrl);
-    localStorage.setItem("currentIndex", currentIndex + 1);
+    localStorage.setItem("userUrl", availableUrl);
+
+    // Mark the URL as assigned in the list
+    assignedUrls.push(availableUrl);
+    localStorage.setItem("assignedUrls", JSON.stringify(assignedUrls));
 
     // Redirect to form page
-    window.location.href = "https://dymond.systems/share-3/form/";
+    window.location.href = "/form/";
 });
+
 
 
 </script>
