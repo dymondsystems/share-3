@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beta Signup</title>
+</head>
+<body>
+    <h1>Sign up to be notified of launch</h1>
+    <form id="signup-form">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+        <button type="submit">Sign Up</button>
+    </form>
+    <script src="landing.js"></script>
+</body>
+</html>
+
+<script>
+const urls = ["url1", "url2", "url3"]; // Add more URLs as needed
+let currentIndex = parseInt(localStorage.getItem('currentIndex')) || 0;
+
+document.getElementById("signup-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const storedEmail = localStorage.getItem("userEmail");
+
+    if (storedEmail === email) {
+        // Redirect returning user
+        window.location.href = "returning.html";
+        return;
+    }
+
+    if (currentIndex >= urls.length) {
+        // Redirect if no more URLs
+        window.location.href = "no-urls.html";
+        return;
+    }
+
+    // Assign a new URL
+    const userUrl = urls[currentIndex];
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userUrl", userUrl);
+    localStorage.setItem("currentIndex", currentIndex + 1);
+
+    // Redirect to form page
+    window.location.href = "form.html";
+});
+
+</script>
