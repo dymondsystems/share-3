@@ -1,69 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up for Beta</title>
-    <style>
-        input, button {
-            padding: 8px;
-            margin-bottom: 10px;
-            width: 300px;
-        }
-        h1 {
-            text-align: center;
-        }
-    </style>
+  <title>Early Access Signup</title>
 </head>
 <body>
-    <h1>Sign Up for Early Access</h1>
+  <div id="signupForm">
+    <h2>Sign Up for Early Access</h2>
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" name="name" required>
+    <label for="email">Your Email:</label>
+    <input type="email" id="email" name="email" required>
+    <button type="submit">Sign Up</button>
+  </div>
 
-    <form id="signup-form">
-        <label for="email">Enter your Email Address:</label><br>
-        <input type="email" id="email" placeholder="Your Email" required><br>
+  <div id="mainForm" style="display: none;">
+    <h2>Share Your Invite</h2>
+    <p>Your unique link: <span id="shareLink"></span></p>
 
-        <button type="button" id="signup-button">Sign Up</button>
-    </form>
+    <label for="friendEmail1">Friend's Email 1:</label>
+    <input type="email" id="friendEmail1" name="friendEmail1">
 
-    <script>
-        // Landing page sign-up logic
-        document.getElementById('signup-button').addEventListener('click', function() {
-            const userEmail = document.getElementById('email').value;
-            
-            // Validate email
-            if (userEmail === "") {
-                alert("Please enter a valid email address.");
-                return;
-            }
+    <label for="friendEmail2">Friend's Email 2:</label>
+    <input type="email" id="friendEmail2" name="friendEmail2">
 
-            // Store the user's email and assign them a unique URL
-            localStorage.setItem('userEmail', userEmail);
+    <label for="friendEmail3">Friend's Email 3:</label>
+    <input type="email" id="friendEmail3" name="friendEmail3">
 
-            // Generate a unique URL for the user
-            let assignedUrlIndex = localStorage.getItem('assignedUrlIndex');
+    <button id="sendEmailButton">Send Email Invite</button>
+    <button id="sendSMSButton">Send SMS Invite</button>
+  </div>
 
-            // If no URL index has been assigned, initialize the list of URLs
-            if (!assignedUrlIndex) {
-                assignedUrlIndex = 0;
-                localStorage.setItem('assignedUrlIndex', assignedUrlIndex);
-            }
+  <script>
+    const signupForm = document.getElementById('signupForm');
+    const mainForm = document.getElementById('mainForm');
+    const shareLinkElement = document.getElementById('shareLink');
+    const sendEmailButton = document.getElementById('sendEmailButton');
+    const sendSMSButton = document.getElementById('sendSMSButton');
 
-            // Define a list of predefined URLs
-            const urls = [
-                "https://example.com/url1",
-                "https://example.com/url2",
-                "https://example.com/url3"
-            ];
+    const baseUrls = [
+      "https://example.com/share1",
+      "https://example.com/share2",
+      "https://example.com/share3",
+    ];
 
-            // Get the assigned URL based on the index
-            const assignedUrl = urls[assignedUrlIndex];
+    let currentUrlIndex = 0;
 
-            // Store the assigned URL for this email
-            localStorage.setItem('assignedUrl', assignedUrl);
+    signupForm.addEventListener('submit', (event) => {
+      event.preventDefault();
 
-            // Redirect the user to the sharing page with their unique URL
-            window.location.href = "sharing.html"; // Assuming your sharing page is named sharing.html
-        });
-    </script>
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+
+      localStorage.setItem('userEmail', email);
+
+      signupForm.style.display = 'none';
+      mainForm.style.display = 'block';
+
+      const baseUrl = baseUrls[currentUrlIndex];
+      const url = baseUrl + '?name=' + encodeURIComponent(name);
+
+      shareLinkElement.textContent = url;
+
+      currentUrlIndex++;
+    });
+
+    // ... (rest of the code for email and SMS buttons)
+  </script>
 </body>
 </html>
