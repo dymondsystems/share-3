@@ -17,8 +17,21 @@
 </html>
 
 <script>
+// Premade URLs
 const urls = ["url1", "url2", "url3"]; // Add more URLs as needed
-let currentIndex = parseInt(localStorage.getItem('currentIndex')) || 0;
+let currentIndex = parseInt(localStorage.getItem("currentIndex")) || 0;
+
+// Check if user is returning
+document.addEventListener("DOMContentLoaded", () => {
+    const userEmail = localStorage.getItem("userEmail");
+    const userUrl = localStorage.getItem("userUrl");
+
+    if (userEmail && userUrl) {
+        // Redirect returning user
+        window.location.href = "https://dymond.systems/share-3/form/";
+        return;
+    }
+});
 
 document.getElementById("signup-form").addEventListener("submit", (event) => {
     event.preventDefault();
@@ -28,7 +41,7 @@ document.getElementById("signup-form").addEventListener("submit", (event) => {
 
     if (storedEmail === email) {
         // Redirect returning user
-        window.location.href = "https://dymond.systems/";
+        window.location.href = "returning.html";
         return;
     }
 
@@ -47,5 +60,6 @@ document.getElementById("signup-form").addEventListener("submit", (event) => {
     // Redirect to form page
     window.location.href = "https://dymond.systems/share-3/form/";
 });
+
 
 </script>
