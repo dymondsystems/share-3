@@ -35,11 +35,16 @@
             const userId = generateFingerprint();
             const userUrl = localStorage.getItem('userUrl_' + userId);
 
+            // If no URL is found, redirect to the landing page (index.html)
             if (!userUrl) {
-                // Redirect if no URL is found
-                window.location.href = "index.html"; 
+                // Check if there are available URLs left
+                if (localStorage.getItem('urlIndex') === null) {
+                    window.location.href = "index.html"; // Redirect if no URLs available
+                } else {
+                    assignUrlToUser(userId); // Assign a new URL if this is a new user
+                }
             } else {
-                // Display the assigned URL
+                // If the user has a URL assigned, display it and allow sharing
                 document.getElementById('user-link').textContent = userUrl;
             }
 
@@ -89,6 +94,28 @@
             return hash.toString();
         }
 
+        // Assign URL to the user if not already assigned
+        function assignUrlToUser(userId) {
+            const urls = [
+                "https://example.com/url1",
+                "https://example.com/url2",
+                "https://example.com/url3"
+            ];
+
+            // Get the current URL index or start from 0
+            let currentIndex = localStorage.getItem('urlIndex');
+            if (!currentIndex) {
+                currentIndex = 0;
+            }
+
+            // Assign the URL to the user and increment the index
+            localStorage.setItem('userUrl_' + userId, urls[currentIndex]);
+            localStorage.setItem('urlIndex', parseInt(currentIndex) + 1); // Increment URL index
+
+            // Redirect to this page again so the user can see their assigned URL
+            window.location.reload();
+        }
+
         // Reset Fingerprint function
         function resetFingerprint() {
             const userId = generateFingerprint();
@@ -96,6 +123,7 @@
             localStorage.removeItem('userUrl_' + userId);
             localStorage.removeItem('assignedUrlIndex_' + userId);
             localStorage.removeItem('userEmail_' + userId);
+            localStorage.removeItem('urlIndex'); // Reset the URL index
         }
     </script>
 </body>
