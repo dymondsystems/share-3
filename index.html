@@ -10,7 +10,7 @@
     <h1>Sign Up for Early Access</h1>
     <form id="signup-form">
         <label for="email">Enter your email:</label>
-        <input type="email" id="email" required>
+        <input type="email" id="email" required placeholder="Your Email">
         <button type="submit">Sign Up</button>
     </form>
 
@@ -34,27 +34,33 @@
             const assignedUrl = urls[urlIndex];
             console.log("Assigned URL: ", assignedUrl);
 
-            // Store the fingerprint and assigned URL
+            // Store the fingerprint and assigned URL in localStorage
             localStorage.setItem("userFingerprint", fingerprint);
             localStorage.setItem("userUrl", assignedUrl);
 
-            // Redirect user to another page
+            // Redirect user to another page (form.html in this example)
             window.location.href = "/share-3/form/"; // Redirect to form or wherever
         }
 
-        // Event listener for the signup form
+        // Event listener for the signup form submission
         document.getElementById("signup-form").addEventListener("submit", (event) => {
-            event.preventDefault();
-            const email = document.getElementById("email").value;
+            event.preventDefault();  // Prevent form from reloading the page
 
-            // Check if the user has a fingerprint and URL assigned
+            const email = document.getElementById("email").value;  // Get the email input value
+
+            if (!email) {
+                alert("Please enter a valid email address.");
+                return;  // Stop if no email is entered
+            }
+
+            // Check if the user already has a fingerprint and assigned URL
             const existingFingerprint = localStorage.getItem("userFingerprint");
             if (existingFingerprint) {
                 // Redirect returning user (they already have a URL)
-                window.location.href = "dashboard.html";
+                window.location.href = "dashboard.html"; // Example: Redirect to dashboard page
             } else {
                 // New user, generate fingerprint and assign URL
-                generateFingerprint(assignUrl);
+                generateFingerprint(assignUrl);  // Generate fingerprint and assign URL
             }
         });
     </script>
