@@ -168,27 +168,6 @@
     });
   </script>
 
-  <script>// Function to clear the email cookie
-function logout() {
-  // Clear the email cookie by setting its expiration date to a past date
-  document.cookie = 'userEmail=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  
-  // Optionally, redirect user after logging out
-  window.location.href = '/login.html';  // Or any other page you want
-}
-
-// Attach the logout function to the logout button click event
-document.getElementById('logoutButton').addEventListener('click', logout);
-</script>
-
-  <script>// Function to clear the email from localStorage
-function logout() {
-  // Clear the email from localStorage
-  localStorage.removeItem('userEmail');
-
-  // Optionally, redirect user after logging out
-  window.location.href = '/login.html';  // Or any other page you want
-}
-</script>
+ 
 </body>
 </html>
