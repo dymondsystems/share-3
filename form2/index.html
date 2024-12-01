@@ -170,11 +170,17 @@
     }
 
     // Log-out functionality
-    document.getElementById("logoutButton").addEventListener("click", () => {
-      localStorage.removeItem('userEmail');
-      document.cookie = "userFingerprint=; max-age=0"; // Expire the cookie
-      window.location.href = "signup.html"; // Redirect to sign-up page after log-out
-    });
+document.getElementById("logoutButton").addEventListener("click", () => {
+  // Clear email from localStorage
+  localStorage.removeItem('userEmail');
+
+  // Remove the fingerprint cookie by setting its expiration date in the past
+  document.cookie = "userFingerprint=; path=/; max-age=0";  // Remove the fingerprint cookie
+
+  // Redirect to sign-up page after logout
+  window.location.href = "https://dymond.systems/share-3/landing"; // Modify as needed
+});
+
   </script>
 </body>
 </html>
