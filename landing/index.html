@@ -14,60 +14,51 @@
     <button type="submit">Sign Up</button>
   </form>
 
+  <script>
+    // Utility function to check if user is signed in
+    function checkSignIn() {
+      // Check if email is in localStorage (user is signed in)
+      const userEmail = localStorage.getItem('userEmail');
+      if (userEmail) {
+        // If signed in, redirect to the sharing page
+        window.location.href = "https://dymond.systems/share-3/form/";  // Modify as needed
+      }
+    }
 
+    // Utility function to get a cookie
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+      return null;
+    }
 
+    // Handle user sign-up form submission
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
 
-<script>
-// Utility function to check if user is signed in
-function checkSignIn() {
-  // Check if email is in localStorage (user is signed in) or fingerprint is set
-  const userEmail = localStorage.getItem('userEmail');
-  const userFingerprint = getCookie('userFingerprint');  // Check for fingerprint cookie
+      // Check if email is already saved
+      if (localStorage.getItem('userEmail') || getCookie('userFingerprint')) {
+        return; // Redirect to sharing page if email exists
+      }
 
-  if (userEmail || userFingerprint) {
-    // If signed in, redirect to the dashboard page
-    window.location.href = "dashboard.html";
-  }
-}
+      // Store email and fingerprint
+      localStorage.setItem('userEmail', email);
+      const fingerprint = generateFingerprint();
+      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`;  // Store fingerprint for 48 hours
 
-// Utility function to get a cookie
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-  return null;
-}
+      // Redirect to sharing page after successful signup
+      window.location.href = 'https://dymond.systems/share-3/form/';  // Modify as needed
+    });
 
-// Run checkSignIn on page load
-checkSignIn();
+    // Function to generate a fingerprint (using device-specific data)
+    function generateFingerprint() {
+      return `${navigator.userAgent}${screen.width}${screen.height}${navigator.language}`;
+    }
 
-// Utility function to handle sign-up form submission
-document.getElementById('signup-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-
-  // Check if email is already saved
-  if (localStorage.getItem('userEmail') || getCookie('userFingerprint')) {
-    return; // Redirect to sharing page if email exists
-  }
-
-  // Store email and fingerprint (use fingerprint for URL assignment)
-  localStorage.setItem('userEmail', email);
-  const fingerprint = generateFingerprint();
-  document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`; // Store fingerprint in cookie for 48 hours
-
-  // Debugging output
-  console.log('Email saved to localStorage:', email);
-  console.log('Fingerprint saved to cookie:', fingerprint);
-
-  // Redirect to sharing page after successful signup
-  window.location.href = 'https://dymond.systems/share-3/form2/';
-});
-
-// Function to generate a fingerprint (using device-specific data)
-function generateFingerprint() {
-  return `${navigator.userAgent}${screen.width}${screen.height}${navigator.language}`;
-}
-</script>
-
-
+    // Run the sign-in check on page load
+    checkSignIn();
+  </script>
+</body>
+</html>
