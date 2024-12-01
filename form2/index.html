@@ -35,6 +35,8 @@
     <button id="mailto-button" style="display:none;">Mailto</button>
     <button id="whatsapp-button" style="display:none;">WhatsApp</button>
     <button id="facebook-button" style="display:none;">Facebook</button>
+    <button id="reddit-button" style="display:none;">Reddit</button>
+    <button id="hacker-news-button" style="display:none;">Hacker News</button>
   </div>
 
   <h3>Message Preview</h3>
@@ -55,14 +57,14 @@
     Copied to clipboard!
   </div>
 
-  <h3>Social Share Options</h3>
-  <!-- Social share buttons -->
-  <button id="facebook-send" style="display:none;">Send via Facebook</button>
-  <button id="facebook-share" style="display:none;">Share to Facebook</button>
-  <button id="reddit-share" style="display:none;">Share to Reddit</button>
-  <button id="hackernews-share" style="display:none;">Share to Hacker News</button>
-
   <script>
+    // Define the URLs for URL assignment
+    const urls = [
+      "https://example.com/url1",
+      "https://example.com/url2",
+      "https://example.com/url3"
+    ];
+
     // Utility function to get a cookie
     function getCookie(name) {
       const value = `; ${document.cookie}`;
@@ -104,11 +106,12 @@
     }
 
     // Handle button click for generating preview
+    let personalizedUrl;
     document.getElementById('generate-button').addEventListener('click', () => {
       const nameInput = document.getElementById("name");
       const name = nameInput.value || "user";
       const assignedUrl = assignUrl();
-      const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
+      personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
       const statsUrl = `${assignedUrl}.stats`;
 
       // Populate the message preview box
@@ -127,29 +130,27 @@
       document.getElementById("facebook-button").style.display = "inline";
       document.getElementById("reddit-button").style.display = "inline";
       document.getElementById("hacker-news-button").style.display = "inline";
-      });
-      // Configure the share buttons
-      document.getElementById("sms-button").onclick = () => {
-        window.location.href = `sms:?body=Check out this amazing site: ${personalizedUrl}`;
-      };
-      document.getElementById("mailto-button").onclick = () => {
-        window.location.href = `mailto:?subject=Check out this site&body=Check out this amazing site: ${personalizedUrl}`;
-      };
-      document.getElementById("whatsapp-button").onclick = () => {
-        window.location.href = `https://wa.me/?text=Check out this amazing site: ${personalizedUrl}`;
-      };
-      document.getElementById("facebook-button").onclick = () => {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`, "_blank");
-      };
-      document.getElementById("reddit-button").onclick = () => {
-      const link = document.getElementById("link-only").value;
-      window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(link)}`, "_blank");
+    });
+
+    // Configure the share buttons
+    document.getElementById("sms-button").onclick = () => {
+      window.location.href = `sms:?body=Check out this amazing site: ${personalizedUrl}`;
+    };
+    document.getElementById("mailto-button").onclick = () => {
+      window.location.href = `mailto:?subject=Check out this site&body=Check out this amazing site: ${personalizedUrl}`;
+    };
+    document.getElementById("whatsapp-button").onclick = () => {
+      window.location.href = `https://wa.me/?text=Check out this amazing site: ${personalizedUrl}`;
+    };
+    document.getElementById("facebook-button").onclick = () => {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`, "_blank");
+    };
+    document.getElementById("reddit-button").onclick = () => {
+      window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(personalizedUrl)}`, "_blank");
     };
     document.getElementById("hacker-news-button").onclick = () => {
-      const link = document.getElementById("link-only").value;
-      window.open(`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(link)}&t=Check out this amazing site!`, "_blank");
+      window.open(`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(personalizedUrl)}&t=Check out this amazing site!`, "_blank");
     };
-    });
 
     // Stats button functionality
     document.getElementById("stats-button").addEventListener("click", () => {
@@ -179,20 +180,17 @@
       setTimeout(() => alertBox.style.display = "none", 3000); // Hide after 3 seconds
     }
 
-
-    
     // Log-out functionality
-document.getElementById("logoutButton").addEventListener("click", () => {
-  // Clear email from localStorage
-  localStorage.removeItem('userEmail');
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      // Clear email from localStorage
+      localStorage.removeItem('userEmail');
 
-  // Remove the fingerprint cookie by setting its expiration date in the past
-  document.cookie = "userFingerprint=; path=/; max-age=0";  // Remove the fingerprint cookie
+      // Remove the fingerprint cookie by setting its expiration date in the past
+      document.cookie = "userFingerprint=; path=/; max-age=0";  // Remove the fingerprint cookie
 
-  // Redirect to sign-up page after logout
-  window.location.href = "https://dymond.systems/share-3/landing"; // Modify as needed
-});
-
+      // Redirect to sign-up page after logout
+      window.location.href = "https://dymond.systems/share-3/landing"; // Modify as needed
+    });
   </script>
 </body>
 </html>
