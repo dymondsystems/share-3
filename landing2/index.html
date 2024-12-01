@@ -15,13 +15,14 @@
   </form>
 
   <script>
-    // Utility function to check if the user is signed in
+    // Utility function to check if user is signed in
     function checkSignIn() {
+      // Check if email is in localStorage (user is signed in)
       const userEmail = localStorage.getItem('userEmail');
       
-      // If user is signed in, redirect to the sharing page
-      if (userEmail && window.location.pathname === '/signup.html') {
-        window.location.href = "https://dymond.systems/share-3/form2";  // Redirect to the sharing page
+      if (userEmail) {
+        // If signed in, redirect to the sharing page (or dashboard if needed)
+        window.location.href = "https://dymond.systems/share-3/form2";  // Modify as needed
       }
     }
 
@@ -38,22 +39,26 @@
       e.preventDefault();
       const email = document.getElementById('email').value;
 
-      // Check if email or fingerprint already exists in localStorage or cookies
+      // Check if email is already saved in localStorage or cookies
       if (localStorage.getItem('userEmail') || getCookie('userFingerprint')) {
         alert("You're already signed up!");
         return;  // Exit form submission if user is already signed up
       }
 
-      // Store email and fingerprint in localStorage and cookies
+      // Store email and fingerprint (use fingerprint for URL assignment)
       localStorage.setItem('userEmail', email);
       const fingerprint = generateFingerprint();
-      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`;  // Store fingerprint for 48 hours
+      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`; // Store fingerprint for 48 hours
+
+      // Debugging output
+      console.log('Email saved to localStorage:', email);
+      console.log('Fingerprint saved to cookie:', fingerprint);
 
       // After successful sign-up, redirect to the sharing page
-      window.location.href = 'https://dymond.systems/share-3/form2';  // Modify this URL as needed
+      window.location.href = 'https://dymond.systems/share-3/form/';  // Modify this URL as needed
     });
 
-    // Generate fingerprint based on device-specific data
+    // Function to generate a fingerprint (using device-specific data)
     function generateFingerprint() {
       return `${navigator.userAgent}${screen.width}${screen.height}${navigator.language}`;
     }
