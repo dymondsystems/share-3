@@ -23,8 +23,8 @@
       // If user is signed in, redirect to the sharing page
       if (userEmail) {
         // If on the sign-up page, redirect to sharing page
-        if (window.location.pathname === '/signup.html' || window.location.pathname === '/') {
-          window.location.href = "https://dymond.systems/share-3/form/";  // Redirect to the sharing page
+        if (window.location.pathname === 'https://dymond.systems/share-3/form2/' || window.location.pathname === '/') {
+          window.location.href = "https://dymond.systems/share-3/form2";  // Redirect to the sharing page
         }
       }
     }
@@ -54,7 +54,7 @@
       document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`;  // Store fingerprint for 48 hours
 
       // After successful sign-up, redirect to the sharing page
-      window.location.href = 'https://dymond.systems/share-3/form/';  // Modify this URL as needed
+      window.location.href = 'https://dymond.systems/share-3/form2';  // Modify this URL as needed
     });
 
     // Generate fingerprint based on device-specific data
