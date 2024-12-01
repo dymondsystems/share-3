@@ -19,7 +19,7 @@
     function checkSignIn() {
       const userEmail = localStorage.getItem('userEmail');
       if (userEmail) {
-        window.location.href = "https://dymond.systems/share-3/form/"; 
+        window.location.href = "https://dymond.systems/share-3/form2"; 
       }
     }
 
@@ -48,7 +48,7 @@
       document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`;  // 48 hours
 
       // Redirect to sharing page after successful signup
-      window.location.href = 'https://dymond.systems/share-3/form/';  
+      window.location.href = 'https://dymond.systems/share-3/form2';  
     });
 
     // Generate fingerprint based on device-specific info
