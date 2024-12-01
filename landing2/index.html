@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up for Beta</title>
+</head>
+<body>
+  <h1>Sign Up for Beta Launch</h1>
+  
+  <form id="signup-form">
+    <label for="email">Email:</label>
+    <input type="email" id="email" required placeholder="Enter your email">
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <script>
+    // Check if user is already signed in
+    function checkSignIn() {
+      const userEmail = localStorage.getItem('userEmail');
+      if (userEmail) {
+        window.location.href = "https://dymond.systems/share-3/form/"; 
+      }
+    }
+
+    // Utility function to get a cookie
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+      return null;
+    }
+
+    // Handle user sign-up form submission
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+
+      // Check if email or fingerprint already exists
+      if (localStorage.getItem('userEmail') || getCookie('userFingerprint')) {
+        alert("You're already signed up!");
+        return; // Prevent form submission if email exists
+      }
+
+      // Store email and fingerprint
+      localStorage.setItem('userEmail', email);
+      const fingerprint = generateFingerprint();
+      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`;  // 48 hours
+
+      // Redirect to sharing page after successful signup
+      window.location.href = 'https://dymond.systems/share-3/form/';  
+    });
+
+    // Generate fingerprint based on device-specific info
+    function generateFingerprint() {
+      return `${navigator.userAgent}${screen.width}${screen.height}${navigator.language}`;
+    }
+
+    // Run the sign-in check on page load
+    checkSignIn();
+  </script>
+</body>
+</html>
