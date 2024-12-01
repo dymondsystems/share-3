@@ -17,15 +17,11 @@
   <script>
     // Utility function to check if the user is signed in
     function checkSignIn() {
-      // Check if the user is already signed in
       const userEmail = localStorage.getItem('userEmail');
       
       // If user is signed in, redirect to the sharing page
-      if (userEmail) {
-        // If on the sign-up page, redirect to sharing page
-        if (window.location.pathname === 'https://dymond.systems/share-3/form2/' || window.location.pathname === '/') {
-          window.location.href = "https://dymond.systems/share-3/form2";  // Redirect to the sharing page
-        }
+      if (userEmail && window.location.pathname === '/signup.html') {
+        window.location.href = "https://dymond.systems/share-3/form2";  // Redirect to the sharing page
       }
     }
 
