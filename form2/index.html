@@ -125,6 +125,8 @@
       document.getElementById("mailto-button").style.display = "inline";
       document.getElementById("whatsapp-button").style.display = "inline";
       document.getElementById("facebook-button").style.display = "inline";
+      document.getElementById("reddit-button").style.display = "inline";
+      document.getElementById("hacker-news-button").style.display = "inline";
       
       // Configure the share buttons
       document.getElementById("sms-button").onclick = () => {
@@ -139,6 +141,14 @@
       document.getElementById("facebook-button").onclick = () => {
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`, "_blank");
       };
+      document.getElementById("reddit-button").onclick = () => {
+      const link = document.getElementById("link-only").value;
+      window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(link)}`, "_blank");
+    };
+    document.getElementById("hacker-news-button").onclick = () => {
+      const link = document.getElementById("link-only").value;
+      window.open(`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(link)}&t=Check out this amazing site!`, "_blank");
+    };
     });
 
     // Stats button functionality
@@ -169,6 +179,8 @@
       setTimeout(() => alertBox.style.display = "none", 3000); // Hide after 3 seconds
     }
 
+
+    
     // Log-out functionality
 document.getElementById("logoutButton").addEventListener("click", () => {
   // Clear email from localStorage
