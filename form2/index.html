@@ -7,8 +7,11 @@
 </head>
 <body>
   <h1>Share Your Unique Link</h1>
+
+  <!-- Log-out Button -->
   <button id="logoutButton">Logout</button>
 
+  <!-- Share Form -->
   <form id="share-form">
     <label for="name">Your Name:</label>
     <input type="text" id="name" placeholder="Enter your name"><br><br>
@@ -38,12 +41,26 @@
   <textarea id="message-preview" readonly></textarea><br>
 
   <h3>Link Only</h3>
-  <textarea id="link-only" readonly></textarea><br>
+  <textarea id="link-only" readonly></textarea>
+  <button id="copy-link">Copy Link</button><br>
 
   <h3>Stats Link</h3>
-  <textarea id="stats-link" readonly></textarea><br>
+  <textarea id="stats-link" readonly></textarea>
+  <button id="copy-stats">Copy Stats Link</button><br>
 
   <button id="stats-button">View Stats</button><br>
+
+  <!-- Bootstrap-style Alert Box (This will show "copied to clipboard") -->
+  <div id="clipboard-alert" class="alert alert-success" style="display: none;" role="alert">
+    Copied to clipboard!
+  </div>
+
+  <h3>Social Share Options</h3>
+  <!-- Social share buttons -->
+  <button id="facebook-send" style="display:none;">Send via Facebook</button>
+  <button id="facebook-share" style="display:none;">Share to Facebook</button>
+  <button id="reddit-share" style="display:none;">Share to Reddit</button>
+  <button id="hackernews-share" style="display:none;">Share to Hacker News</button>
 
   <script>
     // Utility function to get a cookie
@@ -54,16 +71,12 @@
       return null;
     }
 
-    // Utility function to check if user is already signed up
+    // Utility function to check if user is signed up
     function checkSignUp() {
       if (!localStorage.getItem('userEmail') && !getCookie('userFingerprint')) {
         window.location.href = "signup.html"; // Redirect to signup if not signed up
       }
     }
-
-    // Debugging: Log email and fingerprint
-    console.log('User email from localStorage:', localStorage.getItem('userEmail'));
-    console.log('User fingerprint from cookie:', getCookie('userFingerprint'));
 
     // Check if user is signed up
     checkSignUp();
@@ -76,30 +89,6 @@
       console.error("User is not recognized. Redirecting...");
       window.location.href = "signup.html"; // Redirect if no fingerprint or email is found
     }
-
-    // Store URLs in a predefined list
-    const urls = [
-      "https://example.com/url1",
-      "https://example.com/url2",
-      "https://example.com/url3",
-      "https://example.com/url4",
-      "https://example.com/url5",
-      "https://example.com/url6",
-      "https://example.com/url7",
-      "https://example.com/url8",
-      "https://example.com/url9",
-      "https://example.com/url0",
-      "https://example.com/url11",
-      "https://example.com/url12",
-      "https://example.com/url13",
-      "https://example.com/url14",
-      "https://example.com/url15",
-      "https://example.com/url16",
-      "https://example.com/url17",
-      "https://example.com/url18",
-      "https://example.com/url19",
-      "https://example.com/url10"
-    ];
 
     // Assign URL based on fingerprint (store the URL once assigned)
     function assignUrl() {
@@ -114,43 +103,35 @@
       return assignedUrl;
     }
 
-    // Generate preview message
+    // Handle button click for generating preview
     document.getElementById('generate-button').addEventListener('click', () => {
       const nameInput = document.getElementById("name");
-      const email1 = document.getElementById("email1").value;
-      const email2 = document.getElementById("email2").value;
-      const email3 = document.getElementById("email3").value;
-
-      const messageBox = document.getElementById("message-preview");
-      const linkBox = document.getElementById("link-only");
-      const statsLinkBox = document.getElementById("stats-link");
-
       const name = nameInput.value || "user";
       const assignedUrl = assignUrl();
       const personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
       const statsUrl = `${assignedUrl}.stats`;
 
       // Populate the message preview box
-      messageBox.value = `Check out this amazing site: ${personalizedUrl}`;
+      document.getElementById("message-preview").value = `Check out this amazing site: ${personalizedUrl}`;
 
       // Populate the link-only box
-      linkBox.value = personalizedUrl;
+      document.getElementById("link-only").value = personalizedUrl;
 
       // Populate the stats link box
-      statsLinkBox.value = statsUrl;
+      document.getElementById("stats-link").value = statsUrl;
 
-      // Show the buttons
+      // Show the share buttons
       document.getElementById("sms-button").style.display = "inline";
       document.getElementById("mailto-button").style.display = "inline";
       document.getElementById("whatsapp-button").style.display = "inline";
       document.getElementById("facebook-button").style.display = "inline";
-
+      
       // Configure the share buttons
       document.getElementById("sms-button").onclick = () => {
         window.location.href = `sms:?body=Check out this amazing site: ${personalizedUrl}`;
       };
       document.getElementById("mailto-button").onclick = () => {
-        window.location.href = `mailto:?subject=Check out this site&body=Check out this amazing site: ${personalizedUrl}&to=${email1},${email2},${email3}`;
+        window.location.href = `mailto:?subject=Check out this site&body=Check out this amazing site: ${personalizedUrl}`;
       };
       document.getElementById("whatsapp-button").onclick = () => {
         window.location.href = `https://wa.me/?text=Check out this amazing site: ${personalizedUrl}`;
@@ -166,15 +147,34 @@
       window.location.href = `${assignedUrl}.stats`;
     });
 
-    // Function to logout the user (clear email only, not other cookies)
-    document.getElementById('logoutButton').addEventListener('click', () => {
-      // Clear the email from localStorage
+    // Copy to clipboard functionality
+    document.getElementById("copy-link").addEventListener("click", () => {
+      const linkBox = document.getElementById("link-only");
+      linkBox.select();
+      document.execCommand("copy");
+      showClipboardAlert();
+    });
+
+    document.getElementById("copy-stats").addEventListener("click", () => {
+      const statsBox = document.getElementById("stats-link");
+      statsBox.select();
+      document.execCommand("copy");
+      showClipboardAlert();
+    });
+
+    // Function to show "Copied to clipboard" alert
+    function showClipboardAlert() {
+      const alertBox = document.getElementById("clipboard-alert");
+      alertBox.style.display = "block";
+      setTimeout(() => alertBox.style.display = "none", 3000); // Hide after 3 seconds
+    }
+
+    // Log-out functionality
+    document.getElementById("logoutButton").addEventListener("click", () => {
       localStorage.removeItem('userEmail');
-      
-      // Optionally redirect to the signup page
-      window.location.href = 'signup.html';
+      document.cookie = "userFingerprint=; max-age=0"; // Expire the cookie
+      window.location.href = "signup.html"; // Redirect to sign-up page after log-out
     });
   </script>
-
 </body>
 </html>
