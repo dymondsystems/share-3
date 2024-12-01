@@ -15,11 +15,17 @@
   </form>
 
   <script>
-    // Check if user is already signed in
+    // Utility function to check if the user is signed in
     function checkSignIn() {
+      // Check if the user is already signed in
       const userEmail = localStorage.getItem('userEmail');
+      
+      // If user is signed in, redirect to the sharing page
       if (userEmail) {
-        window.location.href = "https://dymond.systems/share-3/form2"; 
+        // If on the sign-up page, redirect to sharing page
+        if (window.location.pathname === '/signup.html' || window.location.pathname === '/') {
+          window.location.href = "https://dymond.systems/share-3/form/";  // Redirect to the sharing page
+        }
       }
     }
 
@@ -36,27 +42,27 @@
       e.preventDefault();
       const email = document.getElementById('email').value;
 
-      // Check if email or fingerprint already exists
+      // Check if email or fingerprint already exists in localStorage or cookies
       if (localStorage.getItem('userEmail') || getCookie('userFingerprint')) {
         alert("You're already signed up!");
-        return; // Prevent form submission if email exists
+        return;  // Exit form submission if user is already signed up
       }
 
-      // Store email and fingerprint
+      // Store email and fingerprint in localStorage and cookies
       localStorage.setItem('userEmail', email);
       const fingerprint = generateFingerprint();
-      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`;  // 48 hours
+      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=172800`;  // Store fingerprint for 48 hours
 
-      // Redirect to sharing page after successful signup
-      window.location.href = 'https://dymond.systems/share-3/form2';  
+      // After successful sign-up, redirect to the sharing page
+      window.location.href = 'https://dymond.systems/share-3/form/';  // Modify this URL as needed
     });
 
-    // Generate fingerprint based on device-specific info
+    // Generate fingerprint based on device-specific data
     function generateFingerprint() {
       return `${navigator.userAgent}${screen.width}${screen.height}${navigator.language}`;
     }
 
-    // Run the sign-in check on page load
+    // Check if user is signed in when the page loads
     checkSignIn();
   </script>
 </body>
