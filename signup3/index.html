@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+</head>
+<body>
+  <h1>Sign Up</h1>
+  
+  <form id="signup-form">
+    <label for="email">Email:</label>
+    <input type="email" id="email" required placeholder="Enter your email">
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <script>
+    const dashboardUrl = "https://dymond.systems/share-3/dashboard2";
+
+    // Check if user already has an account and redirect to the dashboard
+    function checkAccount() {
+      const userEmail = localStorage.getItem('userEmail');
+      if (userEmail) {
+        window.location.href = dashboardUrl;
+      }
+    }
+    checkAccount();
+
+    // Handle form submission
+    document.getElementById('signup-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+
+      // Save email to localStorage
+      localStorage.setItem('userEmail', email);
+
+      // Generate and save a fingerprint
+      const fingerprint = `${navigator.userAgent}${screen.width}${screen.height}${navigator.language}`;
+      document.cookie = `userFingerprint=${fingerprint}; path=/; max-age=2592000`;
+
+      // Redirect to sharing page
+      window.location.href = "https://dymond.systems/share-3/share3";
+    });
+  </script>
+</body>
+</html>
