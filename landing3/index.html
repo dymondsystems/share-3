@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page</title>
+</head>
+<body>
+  <h1>Welcome to Our Platform!</h1>
+  <div id="welcome-section">
+    <p id="welcome-message"></p>
+  </div>
+
+  <form id="signup-form" style="display:none;">
+    <label for="email">Email:</label>
+    <input type="email" id="email" required placeholder="Enter your email">
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <script>
+    // URL Redirection after sign-in or returning
+    const sharePageUrl = "form2"; // Replace with your sharing page URL
+
+    // Utility: Check if user is signed in
+    function checkSignIn() {
+      const userEmail = localStorage.getItem('userEmail');
+      if (userEmail) {
+        document.getElementById("welcome-message").textContent = `Welcome back, ${userEmail}! Redirecting you...`;
+        setTimeout(() => {
+          window.location.href = sharePageUrl;
+        }, 2000);
+      } else {
+        document.getElementById("signup-form").style.display = "block"; // Show sign-up form
+      }
+    }
+
+    // Event listener for sign-up form submission
+    document.getElementById('signup-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+
+      // Save email to local storage
+      localStorage.setItem('userEmail', email);
+      alert(`Thank you for signing up, ${email}! Redirecting you to your dashboard...`);
+      window.location.href = sharePageUrl;
+    });
+
+    // Initial check
+    checkSignIn();
+  </script>
+</body>
+</html>
