@@ -8,59 +8,37 @@
 <body>
   <h1>Dashboard</h1>
   <button id="logoutButton">Logout</button>
-
   <form id="share-form">
     <label for="name">Your Name:</label>
     <input type="text" id="name" placeholder="Enter your name"><br><br>
-
     <button type="button" id="generate-button">Generate Preview</button>
   </form>
-
-  <h2>Share Options</h2>
   <textarea id="message-preview" readonly></textarea>
   <textarea id="link-only" readonly></textarea>
   <button id="copy-link">Copy Link</button><br>
-
   <textarea id="stats-link" readonly></textarea>
   <button id="copy-stats">Copy Stats Link</button>
 
   <script>
     const signupUrl = "https://dymond.systems/share-3/signup3";
-    const urls = [
-      "https://dymond.systems/share-3/url1",
-      "https://dymond.systems/share-3/url2",
-      "https://dymond.systems/share-3/url3",
-      "https://dymond.systems/share-3/url4",
-      "https://dymond.systems/share-3/url5",
-      "https://dymond.systems/share-3/url6",
-      "https://dymond.systems/share-3/url7",
-      "https://dymond.systems/share-3/url8",
-      "https://dymond.systems/share-3/url9",
-      "https://dymond.systems/share-3/url10",
-      "https://dymond.systems/share-3/url11",
-      "https://dymond.systems/share-3/url12",
-      "https://dymond.systems/share-3/url13",
-      "https://dymond.systems/share-3/url14",
-      "https://dymond.systems/share-3/url15",
-      "https://dymond.systems/share-3/url16",
-      "https://dymond.systems/share-3/url17",
-      "https://dymond.systems/share-3/url18",
-      "https://dymond.systems/share-3/url19",
-      "https://dymond.systems/share-3/url20",
-    ];
 
-    // Check if user account exists
-    function checkAccount() {
+    // Check if user is signed in
+    function checkIfSignedIn() {
       const userEmail = localStorage.getItem('userEmail');
       const fingerprint = document.cookie.split("; ").find((row) => row.startsWith("userFingerprint="));
-
       if (!userEmail || !fingerprint) {
         window.location.href = signupUrl; // Redirect if no account exists
       }
     }
-    checkAccount();
+    checkIfSignedIn();
 
-    // Assign a URL based on fingerprint
+    // Handle URL assignment and link generation
+    const urls = [
+      "https://dymond.systems/share-3/url1",
+      "https://dymond.systems/share-3/url2",
+      // Add up to url20...
+    ];
+
     function assignUrl() {
       const fingerprint = document.cookie
         .split("; ")
@@ -81,11 +59,9 @@
       const name = document.getElementById('name').value || "user";
       const assignedUrl = assignUrl();
       personalizedUrl = `${assignedUrl}?name=${encodeURIComponent(name)}`;
-      const statsUrl = `${assignedUrl}.stats`;
 
       document.getElementById("message-preview").value = `Check out this amazing site: ${personalizedUrl}`;
       document.getElementById("link-only").value = personalizedUrl;
-      document.getElementById("stats-link").value = statsUrl;
     });
 
     document.getElementById("copy-link").addEventListener("click", () => {
@@ -94,15 +70,9 @@
       document.execCommand("copy");
     });
 
-    document.getElementById("copy-stats").addEventListener("click", () => {
-      const statsBox = document.getElementById("stats-link");
-      statsBox.select();
-      document.execCommand("copy");
-    });
-
     document.getElementById("logoutButton").addEventListener("click", () => {
       localStorage.removeItem('userEmail');
-      document.cookie = "userFingerprint=; path=/; max-age=0";
+      document.cookie = "userFingerprint=; path=/; max-age=0"; // Clear fingerprint cookie
       window.location.href = signupUrl;
     });
   </script>
